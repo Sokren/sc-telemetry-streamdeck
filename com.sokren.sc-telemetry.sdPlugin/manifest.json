@@ -1,0 +1,41 @@
+{
+	"$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+	"Name": "SC Telemetry Deck",
+	"Version": "0.1.0.0",
+	"Author": "Sokren",
+	"Actions": [
+		{
+			"Name": "Actor Action",
+			"UUID": "com.sokren.sc-telemetry.actor-action",
+			"Icon": "imgs/actions/actor-action/icon",
+			"Tooltip": "Triggers a character action or an emote in Star Citizen.",
+			"PropertyInspectorPath": "ui/actor-action.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/actor-action/key",
+					"TitleAlignment": "bottom"
+				}
+			]
+		}
+	],
+	"Category": "Star Citizen",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Control Star Citizen through the game's local telemetry API.",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "7.1"
+	},
+	"OS": [
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Nodejs": {
+		"Version": "24"
+	},
+	"UUID": "com.sokren.sc-telemetry"
+}

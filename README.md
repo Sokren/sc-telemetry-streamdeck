@@ -68,6 +68,24 @@ Test rapide avec [grpcurl](https://github.com/fullstorydev/grpcurl) :
 grpcurl -plaintext -protoset schema/sc_extrait.desc -d "{}" 127.0.0.1:2942 sc.game.telemetry.v1.GameTelemetryService/ListTriggerableActions
 ```
 
+## Actions Stream Deck
+
+| Action | Rôle |
+|---|---|
+| **Actor Action** | déclenche une action du personnage (mobiGlas, torche, carte stellaire, visière) ou une émote (34). Liste déroulante groupée « Personnage » / « Émotes », fournie par le jeu s'il tourne, sinon par l'instantané `schema/actions.json`. ✔ si le jeu accepte, ⚠ sinon (raison dans le journal du plugin). |
+
+## Développement du plugin
+
+```powershell
+npm install
+npm test                 # tests (faux serveur gRPC construit sur le vrai schéma)
+npm run build            # construit com.sokren.sc-telemetry.sdPluginin\plugin.js et copie schema\ dans datanpx streamdeck validate com.sokren.sc-telemetry.sdPlugin
+npx streamdeck link com.sokren.sc-telemetry.sdPlugin   # une fois ; redémarrer ensuite le logiciel Stream Deck
+npm run watch            # reconstruit et redémarre le plugin à chaque modification
+```
+
+Journal du plugin : `com.sokren.sc-telemetry.sdPlugin\logs\`.
+
 ## Outils (`tools/`)
 
 Scripts Python autonomes (`pip install grpcio protobuf`) :

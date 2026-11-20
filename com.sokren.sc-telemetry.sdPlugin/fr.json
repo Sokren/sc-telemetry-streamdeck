@@ -1,0 +1,8 @@
+{
+	"Description": "Pilote Star Citizen via l'API de télémétrie locale du jeu.",
+	"Category": "Star Citizen",
+	"com.sokren.sc-telemetry.actor-action": {
+		"Name": "Actor Action",
+		"Tooltip": "Déclenche une action du personnage ou une émote dans Star Citizen."
+	}
+}
