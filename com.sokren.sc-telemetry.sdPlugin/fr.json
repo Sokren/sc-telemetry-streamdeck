@@ -4,5 +4,9 @@
 	"com.sokren.sc-telemetry.actor-action": {
 		"Name": "Actor Action",
 		"Tooltip": "Déclenche une action du personnage ou une émote dans Star Citizen."
+	},
+	"com.sokren.sc-telemetry.morse-code": {
+		"Name": "Morse Code",
+		"Tooltip": "Fait clignoter la torche en morse (la torche doit être éteinte au départ)."
 	}
 }

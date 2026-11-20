@@ -31,7 +31,8 @@ export class MorsePlayer {
 		try {
 			for (const at of times) {
 				const delay = start + at - this.now();
-				if (delay > 0) await this.wait(delay, abort.signal);
+				// Arrêt déjà demandé (pendant la bascule précédente) : ne pas attendre un signal passé.
+				if (delay > 0 && !abort.signal.aborted) await this.wait(delay, abort.signal);
 				if (abort.signal.aborted) {
 					result = "stopped";
 					break;

@@ -4,5 +4,9 @@
 	"com.sokren.sc-telemetry.actor-action": {
 		"Name": "Actor Action",
 		"Tooltip": "Triggers a character action or an emote in Star Citizen."
+	},
+	"com.sokren.sc-telemetry.morse-code": {
+		"Name": "Morse Code",
+		"Tooltip": "Flashes the flashlight in Morse code (the flashlight must be off at start)."
 	}
 }

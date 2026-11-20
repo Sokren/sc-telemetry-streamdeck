@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Morse Code</title>
+		<meta charset="utf-8" />
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+	</head>
+	<body>
+		<sdpi-item label="Texte / Text">
+			<sdpi-textfield setting="text" default="SOS" placeholder="SOS"></sdpi-textfield>
+		</sdpi-item>
+		<sdpi-item label="Point / Dot (ms)">
+			<sdpi-range setting="unitMs" min="100" max="2000" step="50" default="400" showlabels></sdpi-range>
+		</sdpi-item>
+		<sdpi-item label="Répétitions / Repeat">
+			<sdpi-range setting="repeat" min="1" max="10" step="1" default="1" showlabels></sdpi-range>
+		</sdpi-item>
+		<sdpi-item>
+			<p>
+				Torche éteinte au départ (le jeu n'indique pas son état). A–Z, 0–9 et espaces ; accents retirés,
+				autres caractères ignorés. Un appui pendant l'émission l'arrête.<br />
+				Flashlight must be off at start. A–Z, 0–9 and spaces. Press again to stop.
+			</p>
+		</sdpi-item>
+	</body>
+</html>

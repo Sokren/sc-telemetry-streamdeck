@@ -10,10 +10,28 @@
 			"Icon": "imgs/actions/actor-action/icon",
 			"Tooltip": "Triggers a character action or an emote in Star Citizen.",
 			"PropertyInspectorPath": "ui/actor-action.html",
-			"Controllers": ["Keypad"],
+			"Controllers": [
+				"Keypad"
+			],
 			"States": [
 				{
 					"Image": "imgs/actions/actor-action/key",
+					"TitleAlignment": "bottom"
+				}
+			]
+		},
+		{
+			"Name": "Morse Code",
+			"UUID": "com.sokren.sc-telemetry.morse-code",
+			"Icon": "imgs/actions/morse-code/icon",
+			"Tooltip": "Flashes the flashlight in Morse code (the flashlight must be off at start).",
+			"PropertyInspectorPath": "ui/morse-code.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/morse-code/key",
 					"TitleAlignment": "bottom"
 				}
 			]
