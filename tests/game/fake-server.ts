@@ -16,15 +16,21 @@ export type FakeHandlers = {
 	actions?: { action_name: string; category: string; holdable?: boolean }[];
 	/** Réponse à TriggerGameAction ; reçoit la requête décodée. Par défaut : status OK (1). */
 	trigger?: (req: TriggerRequest) => { status: number; message?: string };
+	/** Frames diffusées par TelemetryStream (objets au format du schéma), puis fin du flux. */
+	frames?: object[];
+	/** Garder le flux ouvert après les frames (pour tester l'annulation). */
+	holdOpen?: boolean;
+	/** Terminer le flux par une erreur gRPC au lieu d'une fin normale. */
+	streamError?: boolean;
 };
 
-function method(name: string, req: string, res: string) {
+function method(name: string, req: string, res: string, responseStream = false) {
 	const reqType = t(req);
 	const resType = t(res);
 	return {
 		path: `/${P}GameTelemetryService/${name}`,
 		requestStream: false,
-		responseStream: false,
+		responseStream,
 		requestSerialize: (o: object) => Buffer.from(reqType.encode(reqType.fromObject(o)).finish()),
 		requestDeserialize: (b: Buffer) => reqType.toObject(reqType.decode(b)),
 		responseSerialize: (o: object) => Buffer.from(resType.encode(resType.fromObject(o)).finish()),
@@ -38,12 +44,18 @@ export async function startFakeGame(h: FakeHandlers): Promise<{ port: number; st
 		{
 			ListTriggerableActions: method("ListTriggerableActions", "ListTriggerableActionsRequest", "ListTriggerableActionsResponse"),
 			TriggerGameAction: method("TriggerGameAction", "TriggerGameActionRequest", "TriggerGameActionResponse"),
+			TelemetryStream: method("TelemetryStream", "TelemetryStreamRequest", "TelemetryStreamResponse", true),
 		},
 		{
 			ListTriggerableActions: (_call: grpc.ServerUnaryCall<object, object>, cb: grpc.sendUnaryData<object>) =>
 				cb(null, { actions: h.actions ?? [] }),
 			TriggerGameAction: (call: grpc.ServerUnaryCall<TriggerRequest, object>, cb: grpc.sendUnaryData<object>) =>
 				cb(null, h.trigger?.(call.request) ?? { status: 1 }),
+			TelemetryStream: (call: grpc.ServerWritableStream<object, object>) => {
+				for (const f of h.frames ?? []) call.write(f);
+				if (h.streamError) call.emit("error", { code: grpc.status.INTERNAL, details: "erreur simulée" });
+				else if (!h.holdOpen) call.end();
+			},
 		},
 	);
 	const port = await new Promise<number>((resolve, reject) =>
@@ -51,6 +63,6 @@ export async function startFakeGame(h: FakeHandlers): Promise<{ port: number; st
 	);
 	return {
 		port,
-		stop: () => new Promise<void>((resolve) => server.tryShutdown(() => resolve())),
+		stop: async () => server.forceShutdown(),
 	};
 }

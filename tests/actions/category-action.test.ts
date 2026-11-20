@@ -24,6 +24,9 @@ class FakeGame implements GameApi {
 		this.triggered.push([name, timeoutMs]);
 		return this.result;
 	}
+	openStream() {
+		return { cancel() {} };
+	}
 	close(): void {}
 }
 

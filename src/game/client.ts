@@ -1,7 +1,7 @@
 import * as grpc from "@grpc/grpc-js";
 import type protobuf from "protobufjs";
 import { SERVICE, type GameSchema } from "./schema.js";
-import type { GameAction, GameApi, TriggerResult } from "./types.js";
+import type { GameAction, GameApi, StreamSubscription, TelemetryFrame, TriggerResult } from "./types.js";
 
 const STATUS_OK = "TRIGGER_GAME_ACTION_STATUS_OK";
 
@@ -33,6 +33,34 @@ export class GameClient implements GameApi {
 			const reason = typeof code === "number" ? (grpc.status[code] ?? `GRPC_${code}`) : "ERROR";
 			return { ok: false, reason, message: (err as Error).message };
 		}
+	}
+
+	openStream(onFrame: (frame: TelemetryFrame) => void, onEnd: (err?: Error) => void): StreamSubscription {
+		const req = this.#schema.type("TelemetryStreamRequest");
+		const res = this.#schema.type("TelemetryStreamResponse");
+		let finished = false;
+		const finish = (err?: Error) => {
+			if (finished) return;
+			finished = true;
+			onEnd(err);
+		};
+		const call = this.#client.makeServerStreamRequest(
+			`/${SERVICE}/TelemetryStream`,
+			(o: object) => Buffer.from(req.encode(req.fromObject(o)).finish()),
+			(b: Buffer) => res.toObject(res.decode(b), { enums: String, longs: String }) as TelemetryFrame,
+			{},
+		);
+		call.on("data", (frame: TelemetryFrame) => {
+			if (!finished) onFrame(frame);
+		});
+		call.on("error", (err: Error) => finish(err));
+		call.on("end", () => finish());
+		return {
+			cancel: () => {
+				finished = true;
+				call.cancel();
+			},
+		};
 	}
 
 	close(): void {

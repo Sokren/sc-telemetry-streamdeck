@@ -19,6 +19,9 @@ class FakeGame implements GameApi {
 	async trigger(): Promise<TriggerResult> {
 		return { ok: true };
 	}
+	openStream() {
+		return { cancel() {} };
+	}
 	close(): void {}
 }
 

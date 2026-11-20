@@ -1,6 +1,6 @@
 import { GameClient } from "./client.js";
 import { loadSchema } from "./schema.js";
-import type { GameAction, GameApi, TriggerResult } from "./types.js";
+import type { GameAction, GameApi, StreamSubscription, TelemetryFrame, TriggerResult } from "./types.js";
 
 /** Remplaçant quand le schéma est illisible : le plugin reste vivant et chaque appui affiche ⚠. */
 class SchemaUnavailable implements GameApi {
@@ -10,6 +10,11 @@ class SchemaUnavailable implements GameApi {
 	}
 	async trigger(): Promise<TriggerResult> {
 		return { ok: false, reason: "SCHEMA", message: this.detail };
+	}
+	openStream(_onFrame: (frame: TelemetryFrame) => void, onEnd: (err?: Error) => void): StreamSubscription {
+		let cancelled = false;
+		setTimeout(() => cancelled || onEnd(new Error(`Schéma indisponible : ${this.detail}`)), 0);
+		return { cancel: () => void (cancelled = true) };
 	}
 	close(): void {}
 }
