@@ -110,6 +110,19 @@ describe("appui sur la touche", () => {
 	});
 });
 
+describe("actions dangereuses", () => {
+	test.each(["v_self_destruct", "v_eject", "v_emergency_exit", "v_power_set_off", "v_power_toggle", "v_open_all_doors", "v_toggle_all_doors", "v_unlock_all_doors", "v_unlock_all_ports"])(
+		"%s enregistrée (profil importé) → refusée : ⚠, journal, aucun appel au jeu",
+		async (name) => {
+			const key = new FakeKey({ action: name });
+			await action.onKeyDown(keyDown(key));
+			expect(game.triggered).toEqual([]);
+			expect(key.calls).toEqual(["alert"]);
+			expect(logs[0]).toContain(name);
+		},
+	);
+});
+
 describe("titre", () => {
 	test("apparition → titre = libellé de l'action", async () => {
 		const key = new FakeKey({ action: "emote_wave" });

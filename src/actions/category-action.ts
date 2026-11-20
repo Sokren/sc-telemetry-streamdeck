@@ -16,6 +16,22 @@ export const TRIGGER_TIMEOUT_MS = 2000;
 /** Événement de la source de données du panneau de réglage (`datasource="getActions"`). */
 export const DATASOURCE_EVENT = "getActions";
 
+/**
+ * Actions jamais déclenchées sans confirmation (aucune action de ce plugin n'en demande pour
+ * l'instant) : refusées même si un profil importé ou des réglages modifiés les contiennent.
+ */
+export const DANGEROUS_ACTIONS: ReadonlySet<string> = new Set([
+	"v_self_destruct",
+	"v_eject",
+	"v_emergency_exit",
+	"v_power_set_off",
+	"v_power_toggle",
+	"v_open_all_doors",
+	"v_toggle_all_doors",
+	"v_unlock_all_doors",
+	"v_unlock_all_ports",
+]);
+
 /** Réglages enregistrés par touche. */
 export type ActionSettings = { action?: string };
 
@@ -48,6 +64,11 @@ export abstract class CategoryAction extends SingletonAction<ActionSettings> {
 	override async onKeyDown(ev: KeyDownEvent<ActionSettings>): Promise<void> {
 		const name = ev.payload.settings.action;
 		if (!name) {
+			await ev.action.showAlert();
+			return;
+		}
+		if (DANGEROUS_ACTIONS.has(name)) {
+			this.deps.log(`Action dangereuse refusée : ${name}`);
 			await ev.action.showAlert();
 			return;
 		}

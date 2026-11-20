@@ -59,6 +59,32 @@ describe("ActionSource", () => {
 	});
 });
 
+describe("ActionSource — liste du jeu vide ou périmée", () => {
+	test("liste vide (perso pas spawné) → instantané, et le jeu est réinterrogé ensuite", async () => {
+		const game = new FakeGame(true);
+		let answer: GameAction[] = [];
+		game.listActions = async () => (game.calls++, answer);
+		const source = new ActionSource(game, () => snap);
+		expect(await source.getActions()).toEqual({ actions: snap, live: false });
+		answer = live;
+		expect(await source.getActions()).toEqual({ actions: live, live: true });
+		expect(game.calls).toBe(2);
+	});
+
+	test("le cache expire après 60 s", async () => {
+		const game = new FakeGame(true);
+		let now = 0;
+		const source = new ActionSource(game, () => snap, () => now);
+		await source.getActions();
+		now = 59_000;
+		await source.getActions();
+		expect(game.calls).toBe(1);
+		now = 61_000;
+		await source.getActions();
+		expect(game.calls).toBe(2);
+	});
+});
+
 describe("readSnapshot", () => {
 	test("lit schema/actions.json", () => {
 		const actions = readSnapshot(fileURLToPath(new URL("../../schema/actions.json", import.meta.url)));
