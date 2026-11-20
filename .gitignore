@@ -1,0 +1,42 @@
+# --- Claude / assistants IA (fichiers locaux, non publiés) ---
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.mcp.json
+
+# --- Node.js / plugin Stream Deck ---
+node_modules/
+dist/
+*.sdPlugin/bin/
+*.sdPlugin/logs/
+*.streamDeckPlugin
+npm-debug.log*
+.npm/
+.eslintcache
+*.tsbuildinfo
+
+# --- Python (tools/) ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
+
+# --- Données locales du jeu (personnelles) ---
+Game.log
+logbackups/
+user.cfg
+versions/
+
+# --- Éditeurs / OS ---
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Secrets ---
+.env
+.env.*
