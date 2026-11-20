@@ -13,6 +13,7 @@ import { toView } from "../display/format.js";
 import { renderKeySvg, toFeedback } from "../display/render.js";
 import { DISPLAY_VALUES, isDisplayValueId, readValue, type DisplayValueId } from "../display/values.js";
 import type { TelemetryHub } from "../telemetry/hub.js";
+import { ThrottledRenderer } from "./throttled-renderer.js";
 
 export const DIAL_LAYOUT = "layouts/actor-display.json";
 export const VALUES_EVENT = "getValues";
@@ -35,9 +36,6 @@ type Entry = {
 	action: Action<DisplaySettings>;
 	value: DisplayValueId;
 	unsubscribe: () => void;
-	lastSent?: string;
-	lastAt: number;
-	pending: boolean;
 };
 
 const valueOf = (s: DisplaySettings): DisplayValueId => (isDisplayValueId(s.value) ? s.value : DEFAULT_VALUE);
@@ -49,26 +47,19 @@ const valueOf = (s: DisplaySettings): DisplayValueId => (isDisplayValueId(s.valu
  */
 export class DisplayAction extends SingletonAction<DisplaySettings> {
 	readonly #entries = new Map<string, Entry>();
-	readonly #now: () => number;
-	readonly #schedule: (fn: () => void, ms: number) => void;
+	readonly #renderer: ThrottledRenderer;
 
 	constructor(private readonly deps: DisplayActionDeps) {
 		super();
-		this.#now = deps.now ?? Date.now;
-		this.#schedule = deps.schedule ?? ((fn, ms) => void setTimeout(fn, ms));
+		this.#renderer = new ThrottledRenderer({ now: deps.now, schedule: deps.schedule, minIntervalMs: MIN_INTERVAL_MS });
 	}
 
 	override async onWillAppear(ev: WillAppearEvent<DisplaySettings>): Promise<void> {
 		const id = ev.action.id;
 		this.#entries.get(id)?.unsubscribe();
+		this.#renderer.forget(id);
 		if (ev.action.isDial()) await ev.action.setFeedbackLayout(DIAL_LAYOUT);
-		const entry: Entry = {
-			action: ev.action,
-			value: valueOf(ev.payload.settings),
-			unsubscribe: () => {},
-			lastAt: Number.NEGATIVE_INFINITY,
-			pending: false,
-		};
+		const entry: Entry = { action: ev.action, value: valueOf(ev.payload.settings), unsubscribe: () => {} };
 		this.#entries.set(id, entry);
 		entry.unsubscribe = this.deps.hub.subscribe(() => this.#render(id));
 		await this.#render(id, true);
@@ -79,6 +70,7 @@ export class DisplayAction extends SingletonAction<DisplaySettings> {
 		if (!entry) return;
 		entry.unsubscribe();
 		this.#entries.delete(ev.action.id);
+		this.#renderer.forget(ev.action.id);
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<DisplaySettings>): Promise<void> {
@@ -107,27 +99,22 @@ export class DisplayAction extends SingletonAction<DisplaySettings> {
 	}
 
 	/** Envoie le rendu courant s'il a changé, au plus une fois par `MIN_INTERVAL_MS` (sinon envoi différé). */
-	async #render(id: string, force = false): Promise<void> {
-		const entry = this.#entries.get(id);
-		if (!entry) return;
-		const view = toView(entry.value, readValue(entry.value, this.deps.hub.section("actor")), this.deps.lang());
-		const { action } = entry;
-		const payload = action.isDial() ? JSON.stringify(toFeedback(view)) : renderKeySvg(view);
-		if (payload === entry.lastSent) return;
-		const wait = entry.lastAt + MIN_INTERVAL_MS - this.#now();
-		if (!force && wait > 0) {
-			if (!entry.pending) {
-				entry.pending = true;
-				this.#schedule(() => {
-					entry.pending = false;
-					if (this.#entries.get(id) === entry) void this.#render(id);
-				}, wait);
-			}
-			return;
-		}
-		entry.lastSent = payload;
-		entry.lastAt = this.#now();
-		if (action.isDial()) await action.setFeedback(toFeedback(view));
-		else if (action.isKey()) await action.setImage(payload);
+	#render(id: string, force = false): Promise<void> {
+		return this.#renderer.request(
+			id,
+			() => {
+				const entry = this.#entries.get(id);
+				if (!entry) return undefined;
+				const { action } = entry;
+				const view = toView(entry.value, readValue(entry.value, this.deps.hub.section("actor")), this.deps.lang());
+				if (action.isDial()) {
+					const feedback = toFeedback(view);
+					return { payload: JSON.stringify(feedback), send: () => action.setFeedback(feedback) };
+				}
+				const image = renderKeySvg(view);
+				return { payload: image, send: async () => (action.isKey() ? action.setImage(image) : undefined) };
+			},
+			force,
+		);
 	}
 }

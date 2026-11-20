@@ -4,6 +4,7 @@ import { ActorAction } from "./actions/actor-action.js";
 import { ActorDisplayAction } from "./actions/actor-display-action.js";
 import { TRIGGER_TIMEOUT_MS } from "./actions/category-action.js";
 import { MorseCodeAction } from "./actions/morse-code-action.js";
+import { ShipToggleRegistered } from "./actions/ship-toggle-registered.js";
 import { toLang } from "./catalog/labels.js";
 import { ActionSource, readSnapshot } from "./catalog/source.js";
 import { createGameApi } from "./game/create.js";
@@ -47,6 +48,16 @@ streamDeck.actions.registerAction(
 		hub,
 		lang: () => toLang(streamDeck.info.application.language ?? "en"),
 		sendToPropertyInspector: (payload) => streamDeck.ui.sendToPropertyInspector(payload),
+	}),
+);
+
+streamDeck.actions.registerAction(
+	new ShipToggleRegistered({
+		hub,
+		game,
+		lang: () => toLang(streamDeck.info.application.language ?? "en"),
+		sendToPropertyInspector: (payload) => streamDeck.ui.sendToPropertyInspector(payload),
+		log: (msg) => streamDeck.logger.info(msg),
 	}),
 );
 

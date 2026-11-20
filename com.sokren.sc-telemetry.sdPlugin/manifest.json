@@ -58,6 +58,22 @@
 					"ShowTitle": false
 				}
 			]
+		},
+		{
+			"Name": "Ship Toggle",
+			"UUID": "com.sokren.sc-telemetry.ship-toggle",
+			"Icon": "imgs/actions/ship-toggle/icon",
+			"Tooltip": "Ship function with live state: landing gear, lights, VTOL, decoupled, G-safe, power…",
+			"PropertyInspectorPath": "ui/ship-toggle.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/ship-toggle/key",
+					"ShowTitle": false
+				}
+			]
 		}
 	],
 	"Category": "Star Citizen",

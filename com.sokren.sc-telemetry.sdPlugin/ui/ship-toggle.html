@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Ship Toggle</title>
+		<meta charset="utf-8" />
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+	</head>
+	<body>
+		<!-- Liste des fonctions fournie par le plugin (événement « getFunctions »), dans la langue du logiciel Stream Deck. -->
+		<sdpi-item label="Fonction / Function">
+			<sdpi-select setting="function" datasource="getFunctions" hot-reload default="gear"></sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="Mode">
+			<sdpi-select setting="mode" default="toggle">
+				<option value="toggle">Bascule / Toggle</option>
+				<option value="on">Allumer seulement / On only</option>
+				<option value="off">Éteindre seulement / Off only</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="Style">
+			<sdpi-select setting="style" default="text">
+				<option value="text">A — Texte / Text</option>
+				<option value="led">B — Voyant / LED</option>
+				<option value="fill">C — Fond coloré / Filled</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item>
+			<p>
+				La touche montre l'état réel du vaisseau ; « — » hors du vaisseau ou si le vaisseau n'a pas la fonction.
+				Puissance générale et portes : toujours « Allumer seulement » (couper, ouvrir et déverrouiller sont exclus).<br />
+				The key shows the ship's real state; "—" outside a ship or if the ship lacks the function.
+				Main power and doors always act as "On only" (turning off, opening and unlocking are excluded).
+			</p>
+		</sdpi-item>
+	</body>
+</html>

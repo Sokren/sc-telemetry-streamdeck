@@ -17,5 +17,9 @@
 				"Rotate": "Changer de donnée"
 			}
 		}
+	},
+	"com.sokren.sc-telemetry.ship-toggle": {
+		"Name": "Ship Toggle",
+		"Tooltip": "Fonction du vaisseau avec son état réel : train, phares, VTOL, découplage, G-safe, puissance…"
 	}
 }

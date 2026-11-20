@@ -17,5 +17,9 @@
 				"Rotate": "Change value"
 			}
 		}
+	},
+	"com.sokren.sc-telemetry.ship-toggle": {
+		"Name": "Ship Toggle",
+		"Tooltip": "Ship function with live state: landing gear, lights, VTOL, decoupled, G-safe, power…"
 	}
 }
