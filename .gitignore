@@ -9,6 +9,7 @@ node_modules/
 dist/
 *.sdPlugin/bin/
 *.sdPlugin/logs/
+*.sdPlugin/data/
 *.streamDeckPlugin
 npm-debug.log*
 .npm/
