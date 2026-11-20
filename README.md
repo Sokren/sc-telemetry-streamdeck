@@ -4,7 +4,7 @@
 
 Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
 
-- Trigger the actions the game exposes (emotes, flashlight, lights, landing gear, doors, master mode…)
+- Trigger the actions the game exposes (emotes, flashlight, lights, landing gear, doors, master mode…) and see the ship's real state on the key
 - Show your character's vitals on your keys and Stream Deck + dials (oxygen, health, temperatures…); ship state planned
 - No game modification, no memory reading: only the local API provided by the game client
 
@@ -65,6 +65,8 @@ The server only listens on `127.0.0.1`, without TLS or authentication: it is not
 | **Actor Action** | triggers a character action (mobiGlas, flashlight, star map, visor wipe) or an emote (34). Grouped dropdown "Character" / "Emotes", provided by the game when it is running, otherwise by the `schema/actions.json` snapshot. ✔ when the game accepts, ⚠ otherwise (reason in the plugin log). |
 | **Morse Code** | flashes the flashlight in Morse code: text, dot length (100–2000 ms) and repetitions are configurable. Pressing again during playback stops it and restores the flashlight. ⚠ The flashlight must be off at start (the game does not expose its state). |
 | **Actor Display** | shows a character vital, live: health, oxygen, hunger, thirst, body / outside temperature, heart rate, gravity, pressure, radiation, intoxication, breathable air, balance. On a key: value + colored gauge (green ≥ 50 %, orange 25–50 %, red < 25 %). On a Stream Deck + dial: value and gauge on the touchscreen, **rotate to change the value**. "—" when the game is closed or the character has not spawned. |
+| **Ship Toggle** | ship function **with its live state**: landing gear, lights, VTOL, transformation, decoupled, G-safe, proximity assist, ESP, advanced HUD, night vision, NAV/SCM mode, engine / weapon / shield power, main power, doors closed / locked. Per key: **mode** (toggle based on the state read, on only, off only) and **style** (A text, B LED, C filled). "—" outside a ship or when the ship lacks the function. Turning main power off, opening and unlocking doors are excluded. |
+| **Ship Action** | ship and seat commands without state (flight ready, ATC, ping, hail, quantum, seat modes…), grouped dropdown like Actor Action. Dangerous actions are never offered. |
 
 Labels follow the Stream Deck app language (French, otherwise English).
 
@@ -131,7 +133,7 @@ The scripts' messages and comments are in French.
 - In 5.0 PTU, the game accepts the `mobiglas` action but does not open the mobiGlas.
 - Death / respawn events exist in the schema but are not emitted: rely on health instead.
 - A frame may contain only some sections; zero values (`0`, `false`) are omitted (proto3).
-- Some game actions are **dangerous** and run without confirmation (`v_self_destruct`, `v_eject`, `v_power_set_off`…). The plugin refuses to trigger them; the `tools/` scripts do not filter them.
+- Some game actions are **dangerous** and run without confirmation (`v_self_destruct`, `v_eject`, `v_power_set_off`, opening / unlocking doors…). The plugin never offers nor triggers them; the `tools/` scripts do not filter them.
 
 ## License
 

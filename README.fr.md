@@ -4,7 +4,7 @@
 
 Plugin Stream Deck pour **Star Citizen**, basé sur l'API de télémétrie locale du jeu (gRPC, `127.0.0.1:2942`).
 
-- Déclencher les actions exposées par le jeu (émotes, torche, phares, train, portes, master mode…)
+- Déclencher les actions exposées par le jeu (émotes, torche, phares, train, portes, master mode…) et voir l'état réel du vaisseau sur la touche
 - Afficher les constantes du personnage sur les touches et les molettes du Stream Deck + (oxygène, santé, températures…) ; état du vaisseau prévu
 - Aucune modification du jeu, aucune lecture mémoire : uniquement l'API locale fournie par le client
 
@@ -65,6 +65,8 @@ Le serveur écoute uniquement sur `127.0.0.1`, sans TLS ni authentification : il
 | **Actor Action** | déclenche une action du personnage (mobiGlas, torche, carte stellaire, visière) ou une émote (34). Liste déroulante groupée « Personnage » / « Émotes », fournie par le jeu s'il tourne, sinon par l'instantané `schema/actions.json`. ✔ si le jeu accepte, ⚠ sinon (raison dans le journal du plugin). |
 | **Morse Code** | fait clignoter la torche en morse : texte, durée d'un point (100–2000 ms) et répétitions réglables. Un appui pendant l'émission l'arrête et remet la torche dans son état de départ. ⚠ La torche doit être éteinte au départ (le jeu n'expose pas son état). |
 | **Actor Display** | affiche une constante du personnage en continu : santé, oxygène, faim, soif, température corporelle / extérieure, rythme cardiaque, gravité, pression, rayonnement, intoxication, atmosphère respirable, solde. Sur une touche : valeur + jauge colorée (vert ≥ 50 %, orange 25–50 %, rouge < 25 %). Sur une molette de Stream Deck + : valeur et jauge sur l'écran tactile, **tourner pour changer de donnée**. « — » si le jeu est fermé ou le perso pas encore apparu. |
+| **Ship Toggle** | fonction du vaisseau **avec son état réel** : train, phares, VTOL, transformation, découplage, G-safe, assistance de proximité, ESP, HUD avancé, vision nocturne, mode NAV/SCM, puissance moteurs / armes / boucliers, puissance générale, portes fermées / verrouillées. Par touche : **mode** (bascule selon l'état lu, allumer seulement, éteindre seulement) et **style** (A texte, B voyant, C fond coloré). « — » hors du vaisseau ou si le vaisseau n'a pas la fonction. Couper toute la puissance, ouvrir et déverrouiller les portes sont exclus. |
+| **Ship Action** | commandes du vaisseau et du siège sans état (prêt au vol, ATC, ping, héler, quantum, modes du siège…), liste groupée comme Actor Action. Les actions dangereuses ne sont jamais proposées. |
 
 Les libellés suivent la langue du logiciel Stream Deck (français, sinon anglais).
 
@@ -129,7 +131,7 @@ Scripts Python autonomes (`pip install grpcio protobuf`) :
 - En 5.0 PTU, le jeu accepte l'action `mobiglas` mais n'ouvre pas le mobiGlas.
 - Les événements mort / respawn existent dans le schéma mais ne sont pas émis : se baser sur la santé.
 - Une frame peut ne contenir qu'une partie des sections ; les valeurs nulles (`0`, `false`) sont omises (proto3).
-- Certaines actions du jeu sont **dangereuses** et s'exécutent sans confirmation (`v_self_destruct`, `v_eject`, `v_power_set_off`…). Le plugin refuse de les déclencher ; les scripts de `tools/` ne les filtrent pas.
+- Certaines actions du jeu sont **dangereuses** et s'exécutent sans confirmation (`v_self_destruct`, `v_eject`, `v_power_set_off`, ouverture / déverrouillage des portes…). Le plugin ne les propose ni ne les déclenche jamais ; les scripts de `tools/` ne les filtrent pas.
 
 ## Licence
 

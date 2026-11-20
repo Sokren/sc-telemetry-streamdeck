@@ -74,6 +74,22 @@
 					"ShowTitle": false
 				}
 			]
+		},
+		{
+			"Name": "Ship Action",
+			"UUID": "com.sokren.sc-telemetry.ship-action",
+			"Icon": "imgs/actions/ship-action/icon",
+			"Tooltip": "Triggers a ship or seat command (flight ready, ATC, ping, quantum, seat modes…).",
+			"PropertyInspectorPath": "ui/actor-action.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/ship-action/key",
+					"TitleAlignment": "bottom"
+				}
+			]
 		}
 	],
 	"Category": "Star Citizen",

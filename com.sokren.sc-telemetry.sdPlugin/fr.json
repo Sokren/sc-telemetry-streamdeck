@@ -21,5 +21,9 @@
 	"com.sokren.sc-telemetry.ship-toggle": {
 		"Name": "Ship Toggle",
 		"Tooltip": "Fonction du vaisseau avec son état réel : train, phares, VTOL, découplage, G-safe, puissance…"
+	},
+	"com.sokren.sc-telemetry.ship-action": {
+		"Name": "Ship Action",
+		"Tooltip": "Déclenche une commande du vaisseau ou du siège (prêt au vol, ATC, ping, quantum, modes du siège…)."
 	}
 }

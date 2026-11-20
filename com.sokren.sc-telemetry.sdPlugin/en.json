@@ -21,5 +21,9 @@
 	"com.sokren.sc-telemetry.ship-toggle": {
 		"Name": "Ship Toggle",
 		"Tooltip": "Ship function with live state: landing gear, lights, VTOL, decoupled, G-safe, power…"
+	},
+	"com.sokren.sc-telemetry.ship-action": {
+		"Name": "Ship Action",
+		"Tooltip": "Triggers a ship or seat command (flight ready, ATC, ping, quantum, seat modes…)."
 	}
 }
