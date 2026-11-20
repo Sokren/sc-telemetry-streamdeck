@@ -1,0 +1,1 @@
+# sc-telemetry-streamdeck
