@@ -1,0 +1,149 @@
+{
+ "vehicle": {
+  "state": {
+   "name": "AEGS_Avenger_Titan_877343717547",
+   "class_name": "AEGS_Avenger_Titan",
+   "type": "VEHICLE_TYPE_SPACESHIP",
+   "annunciators": {
+    "pwr": "ANNUNCIATOR_STATE_NOMINAL",
+    "wpn": "ANNUNCIATOR_STATE_MINOR_ON",
+    "thr": "ANNUNCIATOR_STATE_NOMINAL",
+    "shld": "ANNUNCIATOR_STATE_MINOR_ON",
+    "cool": "ANNUNCIATOR_STATE_OFF",
+    "qdrv": "ANNUNCIATOR_STATE_OFF",
+    "radr": "ANNUNCIATOR_STATE_NOMINAL",
+    "prox": "ANNUNCIATOR_STATE_NOMINAL",
+    "hit": "ANNUNCIATOR_STATE_NOMINAL",
+    "misl": "ANNUNCIATOR_STATE_NOMINAL"
+   },
+   "flight": {
+    "state": {
+     "is_landed": true,
+     "gear": "VEHICLE_COMPONENT_DEPLOYMENT_STATE_DEPLOYED",
+     "vtol": "VEHICLE_COMPONENT_DEPLOYMENT_STATE_DEPLOYED"
+    },
+    "settings": {
+     "ifcs_coupled": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_esp": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_gravity_compensation": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_g_safe": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_cruise_mode": {},
+     "ifcs_spacebreak_enables_boost": true,
+     "ifcs_speed_limiter": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_proximity_assist": {
+      "enabled": true
+     },
+     "ifcs_proximity_assist_landing": {
+      "enabled": true
+     },
+     "ifcs_stability": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_core": {
+      "enabled": true,
+      "active": true
+     },
+     "course_prediction": true,
+     "ifcs_wind_compensation": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_g_safe_disabled_by_boost": true,
+     "ifcs_command_behaviour": {
+      "enabled": true,
+      "active": true
+     }
+    },
+    "instruments": {
+     "speed": 4.522185e-08,
+     "hydrogen_fuel": 0.9986225,
+     "g_meter": {
+      "max": 3.4770613
+     },
+     "boost": {
+      "reserves": 1
+     },
+     "altitude": 3.4028235e+38,
+     "radar_altitude": 4.4869814,
+     "vertical_speed_indicator": -4.522185e-08,
+     "atmospheric_density": 1.1999913,
+     "heading": 359.99857
+    }
+   },
+   "power": {
+    "powerplants": true,
+    "engines": true,
+    "weapons": true,
+    "coolers": true,
+    "life_support": true,
+    "sensors": true,
+    "shield_generators": true,
+    "shield_emitters": true
+   },
+   "shields": {
+    "level": 1,
+    "faces": [
+     1
+    ]
+   },
+   "health": 1,
+   "master_mode": {
+    "mode": "VEHICLE_MASTER_MODE_SCM",
+    "spooled": true
+   }
+  }
+ },
+ "actor": {
+  "vitals": {
+   "health": {
+    "current": 100,
+    "max": 100
+   },
+   "oxygen": {
+    "current": 1,
+    "max": 1
+   },
+   "hunger": {
+    "current": 86.412796,
+    "max": 100
+   },
+   "thirst": {
+    "current": 79.62086,
+    "max": 100
+   },
+   "body_temperature": {
+    "current": 36.5,
+    "max": 100
+   },
+   "heart_rate": 61.07543,
+   "gravity": 1.0003417,
+   "pressure": 1
+  },
+  "state": {
+   "locomotion": "ACTOR_LOCOMOTION_STATE_SEATED",
+   "crew_role": "ACTOR_CREW_ROLE_PILOT",
+   "seat_name": "AEGS_Avenger_SCItem_Seat_Pilot_877343717572",
+   "uec_balance": "15001986"
+  },
+  "environment": {
+   "external_temperature": 20.999994,
+   "breathable_atmosphere": true
+  }
+ }
+}
