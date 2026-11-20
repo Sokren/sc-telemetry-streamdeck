@@ -79,7 +79,8 @@ grpcurl -plaintext -protoset schema/sc_extrait.desc -d "{}" 127.0.0.1:2942 sc.ga
 ```powershell
 npm install
 npm test                 # tests (faux serveur gRPC construit sur le vrai schéma)
-npm run build            # construit com.sokren.sc-telemetry.sdPluginin\plugin.js et copie schema\ dans datanpx streamdeck validate com.sokren.sc-telemetry.sdPlugin
+npm run build            # construit com.sokren.sc-telemetry.sdPlugin\bin\plugin.js et copie schema\ dans data\
+npx streamdeck validate com.sokren.sc-telemetry.sdPlugin
 npx streamdeck link com.sokren.sc-telemetry.sdPlugin   # une fois ; redémarrer ensuite le logiciel Stream Deck
 npm run watch            # reconstruit et redémarre le plugin à chaque modification
 ```
