@@ -8,5 +8,14 @@
 	"com.sokren.sc-telemetry.morse-code": {
 		"Name": "Morse Code",
 		"Tooltip": "Flashes the flashlight in Morse code (the flashlight must be off at start)."
+	},
+	"com.sokren.sc-telemetry.actor-display": {
+		"Name": "Actor Display",
+		"Tooltip": "Shows a character vital (oxygen, health, temperature…) with a colored gauge.",
+		"Encoder": {
+			"TriggerDescription": {
+				"Rotate": "Change value"
+			}
+		}
 	}
 }

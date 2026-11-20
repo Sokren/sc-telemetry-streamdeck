@@ -35,6 +35,29 @@
 					"TitleAlignment": "bottom"
 				}
 			]
+		},
+		{
+			"Name": "Actor Display",
+			"UUID": "com.sokren.sc-telemetry.actor-display",
+			"Icon": "imgs/actions/actor-display/icon",
+			"Tooltip": "Shows a character vital (oxygen, health, temperature…) with a colored gauge.",
+			"PropertyInspectorPath": "ui/actor-display.html",
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"Encoder": {
+				"layout": "layouts/actor-display.json",
+				"TriggerDescription": {
+					"Rotate": "Change value"
+				}
+			},
+			"States": [
+				{
+					"Image": "imgs/actions/actor-display/key",
+					"ShowTitle": false
+				}
+			]
 		}
 	],
 	"Category": "Star Citizen",

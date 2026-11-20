@@ -5,7 +5,7 @@
 Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
 
 - Trigger the actions the game exposes (emotes, flashlight, lights, landing gear, doors, master mode…)
-- Show the real state of your ship and character on your keys (planned: oxygen, temperatures, gear, shields…)
+- Show your character's vitals on your keys and Stream Deck + dials (oxygen, health, temperatures…); ship state planned
 - No game modification, no memory reading: only the local API provided by the game client
 
 > ⚠️ Unofficial community project, not affiliated with Cloud Imperium Games or Elgato.
@@ -64,6 +64,7 @@ The server only listens on `127.0.0.1`, without TLS or authentication: it is not
 |---|---|
 | **Actor Action** | triggers a character action (mobiGlas, flashlight, star map, visor wipe) or an emote (34). Grouped dropdown "Character" / "Emotes", provided by the game when it is running, otherwise by the `schema/actions.json` snapshot. ✔ when the game accepts, ⚠ otherwise (reason in the plugin log). |
 | **Morse Code** | flashes the flashlight in Morse code: text, dot length (100–2000 ms) and repetitions are configurable. Pressing again during playback stops it and restores the flashlight. ⚠ The flashlight must be off at start (the game does not expose its state). |
+| **Actor Display** | shows a character vital, live: health, oxygen, hunger, thirst, body / outside temperature, heart rate, gravity, pressure, radiation, intoxication, breathable air, balance. On a key: value + colored gauge (green ≥ 50 %, orange 25–50 %, red < 25 %). On a Stream Deck + dial: value and gauge on the touchscreen, **rotate to change the value**. "—" when the game is closed or the character has not spawned. |
 
 Labels follow the Stream Deck app language (French, otherwise English).
 

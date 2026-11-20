@@ -1,12 +1,14 @@
 import { fileURLToPath } from "node:url";
 import streamDeck from "@elgato/streamdeck";
 import { ActorAction } from "./actions/actor-action.js";
+import { ActorDisplayAction } from "./actions/actor-display-action.js";
 import { TRIGGER_TIMEOUT_MS } from "./actions/category-action.js";
 import { MorseCodeAction } from "./actions/morse-code-action.js";
 import { toLang } from "./catalog/labels.js";
 import { ActionSource, readSnapshot } from "./catalog/source.js";
 import { createGameApi } from "./game/create.js";
 import { MorsePlayer } from "./morse/player.js";
+import { TelemetryHub } from "./telemetry/hub.js";
 
 // bin/plugin.js → dossier du plugin ; data/ est rempli par la construction depuis schema/.
 const dataFile = (name: string) => fileURLToPath(new URL(`../data/${name}`, import.meta.url));
@@ -37,5 +39,15 @@ const wait = (ms: number, signal: AbortSignal) =>
 // Un seul lecteur pour toutes les touches Morse : la torche est commune.
 const morsePlayer = new MorsePlayer(async () => (await game.trigger("toggle_flashlight", TRIGGER_TIMEOUT_MS)).ok, wait);
 streamDeck.actions.registerAction(new MorseCodeAction({ player: morsePlayer, log: (msg) => streamDeck.logger.info(msg) }));
+
+// Un seul flux de télémétrie pour tous les afficheurs ; ouvert seulement s'il y en a un de visible.
+const hub = new TelemetryHub(game);
+streamDeck.actions.registerAction(
+	new ActorDisplayAction({
+		hub,
+		lang: () => toLang(streamDeck.info.application.language ?? "en"),
+		sendToPropertyInspector: (payload) => streamDeck.ui.sendToPropertyInspector(payload),
+	}),
+);
 
 streamDeck.connect();

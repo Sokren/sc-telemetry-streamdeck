@@ -8,5 +8,14 @@
 	"com.sokren.sc-telemetry.morse-code": {
 		"Name": "Morse Code",
 		"Tooltip": "Fait clignoter la torche en morse (la torche doit être éteinte au départ)."
+	},
+	"com.sokren.sc-telemetry.actor-display": {
+		"Name": "Actor Display",
+		"Tooltip": "Affiche une constante du perso (oxygène, santé, température…) avec une jauge colorée.",
+		"Encoder": {
+			"TriggerDescription": {
+				"Rotate": "Changer de donnée"
+			}
+		}
 	}
 }
