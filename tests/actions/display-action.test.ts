@@ -35,8 +35,8 @@ class FakeAction {
 	async setImage(img: string) {
 		this.sent.push(`image:${decodeURIComponent(img).includes(">100<") ? "O2=100" : "autre"}`);
 	}
-	async setFeedback(f: { value: string; title: string }) {
-		this.sent.push(`feedback:${f.title}=${f.value}`);
+	async setFeedback(f: { value: string; label: string }) {
+		this.sent.push(`feedback:${f.label}=${f.value}`);
 	}
 	async setFeedbackLayout(layout: string) {
 		this.sent.push(`layout:${layout}`);

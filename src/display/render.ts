@@ -38,10 +38,13 @@ export function renderKeySvg(view: DisplayView): string {
 	return `data:image/svg+xml;charset=utf8,${encodeURIComponent(parts.join(""))}`;
 }
 
-/** Contenu de l'écran d'une molette (clés de `layouts/actor-display.json`). */
-export function toFeedback(view: DisplayView): { title: string; value: string; indicator: { value: number; bar_fill_c: string } } {
+/**
+ * Contenu de l'écran d'une molette (clés de `layouts/actor-display.json`).
+ * Le libellé utilise la clé `label` : `title` est réservée au titre de l'action, masqué par le manifeste.
+ */
+export function toFeedback(view: DisplayView): { label: string; value: string; indicator: { value: number; bar_fill_c: string } } {
 	return {
-		title: view.long,
+		label: view.long,
 		value: view.unit ? `${view.text} ${view.unit}` : view.text,
 		indicator:
 			view.bar !== undefined

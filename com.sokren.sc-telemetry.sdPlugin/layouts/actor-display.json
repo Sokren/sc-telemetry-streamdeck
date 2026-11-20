@@ -3,10 +3,10 @@
 	"id": "com.sokren.sc-telemetry.actor-display",
 	"items": [
 		{
-			"key": "title",
+			"key": "label",
 			"type": "text",
-			"rect": [16, 8, 168, 22],
-			"font": { "size": 16, "weight": 500 },
+			"rect": [12, 8, 176, 22],
+			"font": { "size": 15, "weight": 500 },
 			"alignment": "left",
 			"color": "#9AA4B2"
 		},
