@@ -1,0 +1,19 @@
+{
+	"yes": "Yes",
+	"no": "No",
+	"values": {
+		"health": { "short": "Health", "long": "Health" },
+		"oxygen": { "short": "O₂", "long": "Oxygen" },
+		"hunger": { "short": "Hunger", "long": "Hunger" },
+		"thirst": { "short": "Thirst", "long": "Thirst" },
+		"body_temperature": { "short": "Body", "long": "Body temperature" },
+		"external_temperature": { "short": "Ext.", "long": "Outside temperature" },
+		"heart_rate": { "short": "Heart", "long": "Heart rate" },
+		"gravity": { "short": "Grav.", "long": "Gravity" },
+		"pressure": { "short": "Press.", "long": "Pressure" },
+		"radiation": { "short": "Rad.", "long": "Radiation" },
+		"intoxication": { "short": "Intox.", "long": "Intoxication" },
+		"breathable": { "short": "Air", "long": "Breathable air" },
+		"balance": { "short": "Funds", "long": "Balance" }
+	}
+}
