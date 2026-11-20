@@ -1,112 +1,137 @@
 # SC Telemetry Deck
 
-Plugin Stream Deck pour **Star Citizen**, basé sur l'API de télémétrie locale du jeu (gRPC, `127.0.0.1:2942`).
+🇬🇧 **English** · 🇫🇷 [Français](README.fr.md)
 
-- Déclencher n'importe quelle action exposée par le jeu (phares, train, portes, master mode, emotes, torche…)
-- Afficher l'état réel du vaisseau et du personnage sur les touches (train sorti, phares, boucliers, température…)
-- Aucune modification du jeu, aucune lecture mémoire : uniquement l'API locale fournie par le client
+Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
 
-> ⚠️ Projet communautaire non officiel, sans lien avec Cloud Imperium Games ni Elgato.
-> L'API n'est pas documentée par CIG et peut changer à chaque patch.
+- Trigger the actions the game exposes (emotes, flashlight, lights, landing gear, doors, master mode…)
+- Show the real state of your ship and character on your keys (planned: oxygen, temperatures, gear, shields…)
+- No game modification, no memory reading: only the local API provided by the game client
 
-> 🚧 En cours de développement.
+> ⚠️ Unofficial community project, not affiliated with Cloud Imperium Games or Elgato.
+> The API is not documented by CIG and may change with any patch.
+
+> 🚧 Work in progress.
 
 ---
 
-## Prérequis
+## Installation
 
-| | Version minimale |
+1. Enable telemetry in Star Citizen (see below).
+2. Download `com.sokren.sc-telemetry.streamDeckPlugin` from the latest [release](../../releases/latest).
+3. Double-click it: the Stream Deck app installs it. The actions appear under the **Star Citizen** category.
+
+## Requirements
+
+| | Minimum version |
 |---|---|
-| Star Citizen | **5.0 (PTU)** — le flux de télémétrie existe depuis 4.10.2, mais le déclenchement d'actions (`TriggerGameAction`) n'apparaît qu'en 5.0 |
-| Stream Deck (logiciel) | 7.1 |
-| Node.js (développement uniquement) | 24 |
+| Star Citizen | **5.0 (PTU)** — the telemetry stream exists since 4.10.2, but triggering actions (`TriggerGameAction`) only appears in 5.0 |
+| Stream Deck (app) | 7.1 |
+| Node.js (development only) | 24 |
 
-## Activer la télémétrie dans Star Citizen
+## Enabling telemetry in Star Citizen
 
-Le serveur de télémétrie local est **désactivé par défaut**.
+The local telemetry server is **disabled by default**.
 
-1. Ouvre (ou crée) le fichier `user.cfg` à la racine du canal de jeu :
+1. Open (or create) the `user.cfg` file at the root of the game channel:
    ```
    …\Roberts Space Industries\StarCitizen\PTU\user.cfg
    ```
-   (`LIVE\user.cfg` pour le serveur live, quand la fonctionnalité y sera disponible)
+   (`LIVE\user.cfg` for the live server, once the feature is available there)
 
-2. Ajoute la ligne :
+2. Add the line:
    ```ini
    server.game.telemetry.enabled=1
    ```
 
-3. Lance le jeu. Dans `Game.log` (même dossier), tu dois trouver :
+3. Start the game. In `Game.log` (same folder) you should find:
    ```
    [User CFG ] server.game.telemetry.enabled=true
    <Register Service> Service 'sc.game.telemetry.v1.GameTelemetryService' registered
    <GameTelemetry> Local services server is running on 127.0.0.1:2942
    ```
 
-4. Le flux ne démarre qu'une fois le personnage **spawné** (ligne `Initializing game telemetry component of local player`).
+4. The stream only starts once your character has **spawned** (line `Initializing game telemetry component of local player`).
 
-> Alternative non vérifiée ici : la variable d'environnement `GRPC_CLIENT_SERVER_ENABLED=true`
-> (à définir avant de lancer le RSI Launcher, qui la transmet au jeu).
+> Not verified here: the environment variable `GRPC_CLIENT_SERVER_ENABLED=true`
+> (set before starting the RSI Launcher, which passes it on to the game).
 
-Le serveur écoute uniquement sur `127.0.0.1`, sans TLS ni authentification : il n'est pas accessible depuis le réseau.
+The server only listens on `127.0.0.1`, without TLS or authentication: it is not reachable from the network.
 
-## L'API en bref
+## Stream Deck actions
 
-Service `sc.game.telemetry.v1.GameTelemetryService` :
-
-| RPC | Rôle |
+| Action | What it does |
 |---|---|
-| `TelemetryStream` | flux continu (~17 frames/s) : personnage, vaisseau, armes, événements, retour de force, tourelle |
-| `ListTriggerableActions` | liste des actions déclenchables (112 en 5.0 PTU, voir [schema/actions.json](schema/actions.json)) |
-| `TriggerGameAction` | déclenche une action par son nom (`action_name`, `hold_ms` optionnel) |
+| **Actor Action** | triggers a character action (mobiGlas, flashlight, star map, visor wipe) or an emote (34). Grouped dropdown "Character" / "Emotes", provided by the game when it is running, otherwise by the `schema/actions.json` snapshot. ✔ when the game accepts, ⚠ otherwise (reason in the plugin log). |
+| **Morse Code** | flashes the flashlight in Morse code: text, dot length (100–2000 ms) and repetitions are configurable. Pressing again during playback stops it and restores the flashlight. ⚠ The flashlight must be off at start (the game does not expose its state). |
 
-Le serveur ne supporte pas la réflexion gRPC : il faut le schéma (`.proto` / `.desc`).
-Le schéma est embarqué dans `StarCitizen.exe` ; `tools/sc_extract_proto.py` le reconstruit (voir [schema/](schema/README.md)).
+Labels follow the Stream Deck app language (French, otherwise English).
 
-Test rapide avec [grpcurl](https://github.com/fullstorydev/grpcurl) :
+## The API in short
+
+Service `sc.game.telemetry.v1.GameTelemetryService`:
+
+| RPC | Purpose |
+|---|---|
+| `TelemetryStream` | continuous stream (~17 frames/s): character, vehicle, weapons, events, force feedback, turret |
+| `ListTriggerableActions` | list of triggerable actions (112 in 5.0 PTU, see [schema/actions.json](schema/actions.json)) |
+| `TriggerGameAction` | triggers an action by name (`action_name`, optional `hold_ms`) |
+
+The server does not support gRPC reflection: you need the schema (`.proto` / `.desc`).
+The schema is embedded in `StarCitizen.exe`; `tools/sc_extract_proto.py` rebuilds it (see [schema/](schema/README.md)).
+
+Quick test with [grpcurl](https://github.com/fullstorydev/grpcurl):
 ```cmd
 grpcurl -plaintext -protoset schema/sc_extrait.desc -d "{}" 127.0.0.1:2942 sc.game.telemetry.v1.GameTelemetryService/ListTriggerableActions
 ```
 
-## Actions Stream Deck
-
-| Action | Rôle |
-|---|---|
-| **Actor Action** | déclenche une action du personnage (mobiGlas, torche, carte stellaire, visière) ou une émote (34). Liste déroulante groupée « Personnage » / « Émotes », fournie par le jeu s'il tourne, sinon par l'instantané `schema/actions.json`. ✔ si le jeu accepte, ⚠ sinon (raison dans le journal du plugin). |
-| **Morse Code** | fait clignoter la torche en morse : texte, durée d'un point (100–2000 ms) et répétitions réglables. Un appui pendant l'émission l'arrête et remet la torche dans son état de départ. ⚠ La torche doit être éteinte au départ (le jeu n'expose pas son état). |
-
-## Développement du plugin
+## Plugin development
 
 ```powershell
 npm install
-npm test                 # tests (faux serveur gRPC construit sur le vrai schéma)
-npm run build            # construit com.sokren.sc-telemetry.sdPlugin\bin\plugin.js et copie schema\ dans data\
+npm test                 # tests (fake gRPC server built on the real schema)
+npm run build            # builds com.sokren.sc-telemetry.sdPlugin\bin\plugin.js and copies schema\ into data\
 npx streamdeck validate com.sokren.sc-telemetry.sdPlugin
-npx streamdeck link com.sokren.sc-telemetry.sdPlugin   # une fois ; redémarrer ensuite le logiciel Stream Deck
-npm run watch            # reconstruit et redémarre le plugin à chaque modification
+npx streamdeck link com.sokren.sc-telemetry.sdPlugin   # once; then restart the Stream Deck app
+npm run watch            # rebuilds and restarts the plugin on every change
 ```
 
-Journal du plugin : `com.sokren.sc-telemetry.sdPlugin\logs\`.
+Plugin log: `com.sokren.sc-telemetry.sdPlugin\logs\`.
 
-## Outils (`tools/`)
+### Publishing a release
 
-Scripts Python autonomes (`pip install grpcio protobuf`) :
+```powershell
+npm test; npm run build
+npx streamdeck pack com.sokren.sc-telemetry.sdPlugin -o dist -f
+git tag -a vX.Y.Z -m "SC Telemetry Deck X.Y.Z"; git push origin main vX.Y.Z
+gh release create vX.Y.Z dist\com.sokren.sc-telemetry.streamDeckPlugin --title "SC Telemetry Deck X.Y.Z" --notes-file docs\releases\vX.Y.Z.md
+```
 
-| Script | Rôle |
+Release notes live in `docs/releases/vX.Y.Z.md` and are **bilingual**: English first, then French, separated by a `---` line.
+Update `Version` in the manifest before packing.
+
+## Tools (`tools/`)
+
+Standalone Python scripts (`pip install grpcio protobuf`):
+
+| Script | Purpose |
 |---|---|
-| `sc_extract_proto.py` | extrait le schéma depuis `StarCitizen.exe` et le compare à un schéma existant |
-| `sc_champs_inconnus.py` | affiche les champs envoyés par le jeu mais absents du schéma |
-| `sc_bridge.py` | pont HTTP/JSON → gRPC (`http://127.0.0.1:8742/action/<nom>`, `/state`, `/value/<chemin>`) |
-| `sc_morse.py` | fait clignoter la torche en morse (`python sc_morse.py SOS`) |
-| `toggle_flashlight.pyw` | déclenche l'action portant le nom du fichier, sans fenêtre console |
+| `sc_extract_proto.py` | extracts the schema from `StarCitizen.exe` and compares it with an existing one |
+| `sc_champs_inconnus.py` | shows fields sent by the game but missing from the schema |
+| `sc_bridge.py` | HTTP/JSON → gRPC bridge (`http://127.0.0.1:8742/action/<name>`, `/state`, `/value/<path>`) |
+| `sc_morse.py` | flashes the flashlight in Morse code (`python sc_morse.py SOS`) |
+| `toggle_flashlight.pyw` | triggers the action named after the file, without a console window |
 
-## Limites connues
+The scripts' messages and comments are in French.
 
-- L'état de la **torche** n'est pas exposé (action `toggle_flashlight` uniquement).
-- Les événements mort / respawn existent dans le schéma mais ne sont pas émis : se baser sur la santé.
-- Une frame peut ne contenir qu'une partie des sections ; les valeurs nulles (`0`, `false`) sont omises (proto3).
-- Certaines actions sont **dangereuses** et s'exécutent sans confirmation (`v_self_destruct`, `v_eject`, `v_power_set_off`…).
+## Known limitations
 
-## Licence
+- The **flashlight** state is not exposed (only the `toggle_flashlight` action).
+- In 5.0 PTU, the game accepts the `mobiglas` action but does not open the mobiGlas.
+- Death / respawn events exist in the schema but are not emitted: rely on health instead.
+- A frame may contain only some sections; zero values (`0`, `false`) are omitted (proto3).
+- Some game actions are **dangerous** and run without confirmation (`v_self_destruct`, `v_eject`, `v_power_set_off`…). The plugin refuses to trigger them; the `tools/` scripts do not filter them.
 
-À définir.
+## License
+
+To be decided.

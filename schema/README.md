@@ -1,38 +1,41 @@
-# Schéma de l'API
+# API schema
 
-CIG ne publie pas le `.proto`. Il est reconstruit à partir des descripteurs protobuf embarqués dans `StarCitizen.exe`.
+🇬🇧 **English** · 🇫🇷 [Français](README.fr.md)
 
-**Version actuelle : Star Citizen 5.0.202.205 PTU (build 13238477)**, extraite le 2026-11-20.
+CIG does not publish the `.proto`. It is rebuilt from the protobuf descriptors embedded in `StarCitizen.exe`.
 
-## Fichiers
+**Current version: Star Citizen 5.0.202.205 PTU (build 13238477)**, extracted on 2026-11-20.
 
-| Fichier | Rôle |
+## Files
+
+| File | Purpose |
 |---|---|
-| `sc_extrait.desc` | **Référence.** `FileDescriptorSet` binaire (`types.proto` + `api.proto`) : chargé par le plugin, les scripts de `tools/` et `grpcurl -protoset` |
-| `sc_extrait.proto` | Version lisible, pour consultation (les deux fichiers concaténés : non compilable tel quel par `protoc`) |
-| `actions.json` | Instantané de `ListTriggerableActions` (112 actions) : documentation seulement, le plugin interroge toujours le jeu |
+| `sc_extrait.desc` | **Reference.** Binary `FileDescriptorSet` (`types.proto` + `api.proto`): loaded by the plugin, the `tools/` scripts and `grpcurl -protoset` |
+| `sc_extrait.proto` | Readable version, for reference (both files concatenated: not compilable as is by `protoc`) |
+| `actions.json` | Snapshot of `ListTriggerableActions` (112 actions): documentation and fallback list when the game is closed; the plugin always asks the game first |
 
-- Package : `sc.game.telemetry.v1`
-- Service : `GameTelemetryService` (`TelemetryStream`, `ListTriggerableActions`, `TriggerGameAction`)
+- Package: `sc.game.telemetry.v1`
+- Service: `GameTelemetryService` (`TelemetryStream`, `ListTriggerableActions`, `TriggerGameAction`)
 
-Les scripts de `tools/` cherchent `sc_extrait.desc` à côté d'eux, puis dans `schema/`.
+The `tools/` scripts look for `sc_extrait.desc` next to themselves, then in `schema/`.
+The plugin copies `sc_extrait.desc` and `actions.json` into its `data/` folder on every build.
 
-## Mettre à jour après un patch
+## Updating after a patch
 
-Depuis le dossier `schema/` :
+From the `schema/` folder:
 
 ```powershell
-$exe = "J:\Jeux\Roberts Space Industries\StarCitizen\PTU\Bin64\StarCitizen.exe"   # adapter
+$exe = "J:\Jeux\Roberts Space Industries\StarCitizen\PTU\Bin64\StarCitizen.exe"   # adjust
 Copy-Item sc_extrait.desc ancien.desc
 python ..\tools\sc_extract_proto.py $exe --compare ancien.desc
 Remove-Item ancien.desc
 ```
 
-Puis, jeu lancé et perso spawné :
+Then, with the game running and your character spawned:
 
 ```powershell
-python ..\tools\sc_champs_inconnus.py   # doit ne rien afficher si le schéma est complet
+python ..\tools\sc_champs_inconnus.py   # should print nothing if the schema is complete
 ```
 
-La version du jeu est dans `Game.log` (`FileVersion:` et `Build(…)`).
-Vérifier les différences avec `git diff`, et nommer le commit avec la version du jeu, par ex. `schema: 5.0 PTU build 13238477`.
+The game version is in `Game.log` (`FileVersion:` and `Build(…)`).
+Check the differences with `git diff`, and name the commit after the game version, e.g. `schema: 5.0 PTU build 13238477`.
