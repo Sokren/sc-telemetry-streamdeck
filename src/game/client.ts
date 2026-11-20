@@ -12,7 +12,12 @@ export class GameClient implements GameApi {
 
 	constructor(schema: GameSchema, address = "127.0.0.1:2942") {
 		this.#schema = schema;
-		this.#client = new grpc.Client(address, grpc.credentials.createInsecure());
+		// Le jeu tourne en local : on plafonne la reconnexion interne de gRPC à 5 s (120 s par défaut),
+		// pour que les touches se remettent à jour vite après un redémarrage du jeu.
+		this.#client = new grpc.Client(address, grpc.credentials.createInsecure(), {
+			"grpc.initial_reconnect_backoff_ms": 1000,
+			"grpc.max_reconnect_backoff_ms": 5000,
+		});
 	}
 
 	async listActions(timeoutMs: number): Promise<GameAction[]> {

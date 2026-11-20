@@ -7,6 +7,8 @@ export type TelemetryHubOptions = {
 	retryMs?: number[];
 	/** Fréquence de vérification de la péremption. */
 	checkMs?: number;
+	/** Flux ouvert sans aucune frame pendant ce délai → annulé et rouvert (ex. ouvert avant le spawn). */
+	silenceMs?: number;
 	now?: () => number;
 };
 
@@ -20,6 +22,7 @@ export class TelemetryHub {
 	readonly #staleMs: number;
 	readonly #retryMs: number[];
 	readonly #checkMs: number;
+	readonly #silenceMs: number;
 	readonly #now: () => number;
 
 	readonly #listeners = new Set<() => void>();
@@ -28,12 +31,15 @@ export class TelemetryHub {
 	#retryTimer: ReturnType<typeof setTimeout> | undefined;
 	#checkTimer: ReturnType<typeof setInterval> | undefined;
 	#attempt = 0;
+	/** Heure d'ouverture du flux ou de la dernière frame reçue. */
+	#lastActivity = 0;
 
 	constructor(game: Pick<GameApi, "openStream">, opts: TelemetryHubOptions = {}) {
 		this.#game = game;
 		this.#staleMs = opts.staleMs ?? 3000;
 		this.#retryMs = opts.retryMs ?? [1000, 2000, 4000, 5000];
 		this.#checkMs = opts.checkMs ?? 500;
+		this.#silenceMs = opts.silenceMs ?? 10_000;
 		this.#now = opts.now ?? Date.now;
 	}
 
@@ -72,6 +78,7 @@ export class TelemetryHub {
 
 	#open(): void {
 		this.#retryTimer = undefined;
+		this.#lastActivity = this.#now();
 		this.#stream = this.#game.openStream(
 			(frame) => this.#onFrame(frame),
 			() => this.#onEnd(),
@@ -81,6 +88,7 @@ export class TelemetryHub {
 	#onFrame(frame: TelemetryFrame): void {
 		this.#attempt = 0;
 		const at = this.#now();
+		this.#lastActivity = at;
 		for (const [name, value] of Object.entries(frame)) {
 			if (value && typeof value === "object") this.#sections.set(name, { value: value as Record<string, unknown>, at, stale: false });
 		}
@@ -96,6 +104,11 @@ export class TelemetryHub {
 	}
 
 	#checkStale(): void {
+		if (this.#stream && this.#now() - this.#lastActivity >= this.#silenceMs) {
+			// Flux accepté mais muet : on le relance comme s'il s'était terminé.
+			this.#stream.cancel();
+			this.#onEnd();
+		}
 		let changed = false;
 		for (const s of this.#sections.values()) {
 			if (!s.stale && this.#now() - s.at >= this.#staleMs) {

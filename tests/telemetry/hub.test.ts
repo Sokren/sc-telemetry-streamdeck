@@ -112,6 +112,26 @@ describe("TelemetryHub — reconnexion", () => {
 		expect(game.opened).toHaveLength(4);
 	});
 
+	test("flux ouvert mais muet pendant 10 s (perso pas encore apparu) → annulé puis rouvert", () => {
+		hub.subscribe(() => {});
+		vi.advanceTimersByTime(9500);
+		expect(game.last.cancelled).toBe(false);
+		vi.advanceTimersByTime(1000);
+		expect(game.opened[0].cancelled).toBe(true);
+		vi.advanceTimersByTime(1000);
+		expect(game.opened).toHaveLength(2);
+	});
+
+	test("flux qui envoie des frames → jamais coupé pour silence", () => {
+		hub.subscribe(() => {});
+		for (let i = 0; i < 30; i++) {
+			game.last.onFrame({ actor: {} });
+			vi.advanceTimersByTime(1000);
+		}
+		expect(game.opened).toHaveLength(1);
+		expect(game.last.cancelled).toBe(false);
+	});
+
 	test("désabonnement pendant l'attente → pas de réouverture", () => {
 		const off = hub.subscribe(() => {});
 		game.last.onEnd(new Error());
