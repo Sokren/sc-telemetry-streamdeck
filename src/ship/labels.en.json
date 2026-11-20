@@ -1,0 +1,21 @@
+{
+	"functions": {
+		"gear": { "name": "Landing gear", "label": "Gear", "on": "DOWN", "off": "UP" },
+		"lights": { "name": "Lights", "label": "Lights", "on": "ON", "off": "OFF" },
+		"vtol": { "name": "VTOL", "label": "VTOL", "on": "ON", "off": "OFF" },
+		"transform": { "name": "Transformation", "label": "Transform", "on": "DEPLOYED", "off": "STOWED" },
+		"decoupled": { "name": "Decoupled mode", "label": "Decoupled", "on": "DECOUPLED", "off": "COUPLED" },
+		"gsafe": { "name": "G-safe", "label": "G-safe", "on": "ON", "off": "OFF" },
+		"proximity": { "name": "Proximity assist", "label": "Proximity", "on": "ON", "off": "OFF" },
+		"esp": { "name": "ESP", "label": "ESP", "on": "ON", "off": "OFF" },
+		"advanced_hud": { "name": "Advanced HUD", "label": "Adv. HUD", "on": "ON", "off": "OFF" },
+		"night_vision": { "name": "Night vision", "label": "Night vision", "on": "ON", "off": "OFF" },
+		"master_nav": { "name": "NAV / SCM mode", "label": "Mode", "on": "NAV", "off": "SCM" },
+		"power_engines": { "name": "Engine power", "label": "Engines", "on": "ON", "off": "OFF" },
+		"power_weapons": { "name": "Weapon power", "label": "Weapons", "on": "ON", "off": "OFF" },
+		"power_shields": { "name": "Shield power", "label": "Shields", "on": "ON", "off": "OFF" },
+		"power_main": { "name": "Main power (turn on)", "label": "Power", "on": "ON", "off": "OFF" },
+		"doors_closed": { "name": "Doors closed (close)", "label": "Doors", "on": "CLOSED", "off": "OPEN" },
+		"doors_locked": { "name": "Doors locked", "label": "Locks", "on": "LOCKED", "off": "UNLOCKED" }
+	}
+}

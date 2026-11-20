@@ -1,0 +1,21 @@
+{
+	"functions": {
+		"gear": { "name": "Train d'atterrissage", "label": "Train", "on": "SORTI", "off": "RENTRÉ" },
+		"lights": { "name": "Phares", "label": "Phares", "on": "ON", "off": "OFF" },
+		"vtol": { "name": "VTOL", "label": "VTOL", "on": "ON", "off": "OFF" },
+		"transform": { "name": "Transformation", "label": "Transfo.", "on": "DÉPLOYÉ", "off": "RENTRÉ" },
+		"decoupled": { "name": "Découplage", "label": "Découplage", "on": "DÉCOUPLÉ", "off": "COUPLÉ" },
+		"gsafe": { "name": "G-safe", "label": "G-safe", "on": "ON", "off": "OFF" },
+		"proximity": { "name": "Assistance de proximité", "label": "Proximité", "on": "ON", "off": "OFF" },
+		"esp": { "name": "ESP", "label": "ESP", "on": "ON", "off": "OFF" },
+		"advanced_hud": { "name": "HUD avancé", "label": "HUD avancé", "on": "ON", "off": "OFF" },
+		"night_vision": { "name": "Vision nocturne", "label": "Vision noct.", "on": "ON", "off": "OFF" },
+		"master_nav": { "name": "Mode NAV / SCM", "label": "Mode", "on": "NAV", "off": "SCM" },
+		"power_engines": { "name": "Puissance moteurs", "label": "Moteurs", "on": "ON", "off": "OFF" },
+		"power_weapons": { "name": "Puissance armes", "label": "Armes", "on": "ON", "off": "OFF" },
+		"power_shields": { "name": "Puissance boucliers", "label": "Boucliers", "on": "ON", "off": "OFF" },
+		"power_main": { "name": "Puissance générale (allumer)", "label": "Puissance", "on": "ON", "off": "OFF" },
+		"doors_closed": { "name": "Portes fermées (fermer)", "label": "Portes", "on": "FERMÉES", "off": "OUVERTES" },
+		"doors_locked": { "name": "Portes verrouillées", "label": "Verrous", "on": "FERMÉS", "off": "OUVERTS" }
+	}
+}
