@@ -5,7 +5,7 @@
 Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
 
 - Trigger the actions the game exposes (emotes, flashlight, lights, landing gear, doors, master mode…) and see the ship's real state on the key
-- Show your character's vitals on your keys and Stream Deck + dials (oxygen, health, temperatures…); ship state planned
+- Show your character's vitals on your keys and Stream Deck + dials (oxygen, health, temperatures…)
 - No game modification, no memory reading: only the local API provided by the game client
 
 > ⚠️ Unofficial community project, not affiliated with Cloud Imperium Games or Elgato.

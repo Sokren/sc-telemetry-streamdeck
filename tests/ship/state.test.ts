@@ -141,6 +141,15 @@ describe("réglages de vol (Availability)", () => {
 	});
 });
 
+describe("section flight absente (champ optional)", () => {
+	test("vision nocturne et HUD avancé → indisponibles, pas « OFF »", () => {
+		const noFlight = withState((s) => delete s.flight);
+		expect(read("night_vision", noFlight)).toBe("unavailable");
+		expect(read("advanced_hud", noFlight)).toBe("unavailable");
+		expect(read("gsafe", noFlight)).toBe("unavailable");
+	});
+});
+
 describe("mode maître et HUD avancé", () => {
 	const nav = (s: Obj) => (s.master_mode = { mode: "VEHICLE_MASTER_MODE_NAVIGATION" });
 

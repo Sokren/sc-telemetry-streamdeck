@@ -75,10 +75,11 @@ export function readShipState(id: ShipFunctionId, vehicle: Obj | undefined, acto
 		case "esp":
 			return availability(settings.ifcs_esp);
 		case "night_vision":
-			return bool(settings.flight_light_amplification);
+			return flight ? bool(settings.flight_light_amplification) : "unavailable";
 		case "master_nav":
 			return masterMode ? enumPair(masterMode.mode, NAV, SCM) : "unavailable";
 		case "advanced_hud": {
+			if (!flight) return "unavailable";
 			const mode = masterMode?.mode;
 			if (mode === NAV) return bool(settings.advanced_hud_enabled_nav);
 			if (mode === SCM) return bool(settings.advanced_hud_enabled_scm);

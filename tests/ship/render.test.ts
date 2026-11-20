@@ -79,6 +79,16 @@ describe("renderShipKey", () => {
 		}
 	});
 
+	test("« — » visible dans les trois styles quand l'état est inconnu", () => {
+		for (const style of ["text", "led", "fill"] as const) expect(svgOf(renderShipKey(none, style)), style).toContain(">—<");
+	});
+
+	test("style B : voyant éteint gris visible (distinct de « pas de données »)", () => {
+		const svg = svgOf(renderShipKey({ ...on, word: "RENTRÉ", tone: "off" }, "led"));
+		expect(svg).toMatch(new RegExp(`<circle[^>]*fill="${SHIP_COLORS.off}"`));
+		expect(svg).not.toContain(">—<");
+	});
+
 	test("une icône par fonction, rendu stable, texte échappé", () => {
 		const icons = new Set(SHIP_FUNCTION_IDS.map((id) => svgOf(renderShipKey({ ...on, id }, "text"))));
 		expect(icons.size).toBe(SHIP_FUNCTION_IDS.length);

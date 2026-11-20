@@ -5,7 +5,7 @@
 Plugin Stream Deck pour **Star Citizen**, basé sur l'API de télémétrie locale du jeu (gRPC, `127.0.0.1:2942`).
 
 - Déclencher les actions exposées par le jeu (émotes, torche, phares, train, portes, master mode…) et voir l'état réel du vaisseau sur la touche
-- Afficher les constantes du personnage sur les touches et les molettes du Stream Deck + (oxygène, santé, températures…) ; état du vaisseau prévu
+- Afficher les constantes du personnage sur les touches et les molettes du Stream Deck + (oxygène, santé, températures…)
 - Aucune modification du jeu, aucune lecture mémoire : uniquement l'API locale fournie par le client
 
 > ⚠️ Projet communautaire non officiel, sans lien avec Cloud Imperium Games ni Elgato.

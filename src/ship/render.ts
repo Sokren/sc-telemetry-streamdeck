@@ -94,9 +94,14 @@ export function renderShipKey(view: ShipView, style: ShipStyle): string {
 			`<text x="72" y="120" font-family="${FONT}" font-size="${size}" font-weight="bold" fill="${wordColor}" text-anchor="middle">${escapeXml(view.word)}</text>`,
 		);
 	}
-	if (style === "led" && view.tone !== "none") {
-		const led = view.tone === "on" ? SHIP_COLORS.on : view.tone === "moving" ? SHIP_COLORS.moving : SHIP_COLORS.dim;
-		parts.push(`<circle cx="124" cy="20" r="9" fill="${led}"/>`);
+	if (style === "led") {
+		if (view.tone === "none") {
+			// Pas de données : « — » à la place du voyant, pour ne pas ressembler à « éteint ».
+			parts.push(`<text x="124" y="30" font-family="${FONT}" font-size="26" font-weight="bold" fill="${SHIP_COLORS.none}" text-anchor="middle">${escapeXml(view.word)}</text>`);
+		} else {
+			const led = view.tone === "on" ? SHIP_COLORS.on : view.tone === "moving" ? SHIP_COLORS.moving : SHIP_COLORS.off;
+			parts.push(`<circle cx="124" cy="20" r="9" fill="${led}"/>`);
+		}
 	}
 	parts.push(`</svg>`);
 	return `data:image/svg+xml;charset=utf8,${encodeURIComponent(parts.join(""))}`;
