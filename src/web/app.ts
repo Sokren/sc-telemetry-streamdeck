@@ -62,6 +62,8 @@ const ui = SwaggerUIBundle({
 	url: "/api/v1/openapi.json",
 	dom_id: "#swagger-ui",
 	persistAuthorization: true,
+	// Barre de recherche : filtre les sections (General, Actions, Character, Ship…).
+	filter: true,
 	onComplete: () => {
 		let token = null;
 		try { token = localStorage.getItem("sctd-token"); } catch (e) { /* stockage indisponible */ }

@@ -67,6 +67,11 @@ describe("contrat OpenAPI", () => {
 		expect(ui.body).not.toContain(s.token);
 	});
 
+	test("Swagger UI a une barre de recherche", async () => {
+		const ui = await s.call("GET", "/api/docs", { auth: false });
+		expect(ui.body).toMatch(/filter:\s*true/);
+	});
+
 	test("le jeton est aussi accepté dans l'URL (?t=)", async () => {
 		const r = await s.call("GET", `/api/v1/status?t=${s.token}`, { auth: false });
 		expect(r.status).toBe(200);
