@@ -6,7 +6,9 @@
     "scripts": {
         "build": "rollup -c",
         "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart com.sokren.sc-telemetry\"",
-        "test": "vitest run"
+        "test": "vitest run",
+        "build:web": "rollup -c rollup.web.config.mjs",
+        "start:web": "node dist-web/server.mjs"
     },
     "engines": {
         "node": ">=24"

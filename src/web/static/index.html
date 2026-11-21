@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<title>SC Telemetry Deck</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header>
+			<h1 id="title">SC Telemetry Deck</h1>
+			<span id="status" class="status"><span class="dot"></span><span id="status-text"></span></span>
+			<nav>
+				<button id="lang" type="button"></button>
+				<a id="api" href="/api/docs" target="_blank" rel="noopener"></a>
+			</nav>
+		</header>
+		<main>
+			<p id="message" hidden></p>
+			<div id="grid" class="grid"></div>
+		</main>
+		<script type="module" src="app.js"></script>
+	</body>
+</html>

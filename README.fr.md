@@ -88,6 +88,22 @@ Test rapide avec [grpcurl](https://github.com/fullstorydev/grpcurl) :
 grpcurl -plaintext -protoset schema/sc_extrait.desc -d "{}" 127.0.0.1:2942 sc.game.telemetry.v1.GameTelemetryService/ListTriggerableActions
 ```
 
+## Appli web et API publique (aperçu)
+
+Pour les joueurs **sans Stream Deck** : les mêmes boutons et afficheurs dans un navigateur, servis par une petite appli locale. Elle expose aussi une **API publique documentée (OpenAPI / Swagger)** utilisable par n'importe quel autre logiciel (overlay de stream, bot, tableau de bord…).
+
+```powershell
+npm install
+npm run build:web
+npm run start:web        # ouvre la page dans le navigateur (ajouter -- --no-open pour ne pas l'ouvrir)
+```
+
+- Page : `http://127.0.0.1:8743/` — l'appli l'ouvre avec le jeton d'accès inclus.
+- Swagger UI : `http://127.0.0.1:8743/api/docs` — contrat : `/api/v1/openapi.json`.
+- Chaque appel à l'API demande le jeton (`Authorization: Bearer …`), enregistré dans `%APPDATA%\SC Telemetry Deck\settings.json`.
+- Cet aperçu n'écoute que **sur ce PC** (`127.0.0.1`). L'accès tablette / téléphone (QR code), la grille modifiable et l'exécutable `.exe` arrivent aux étapes suivantes.
+- Mêmes règles de sécurité que le plugin : les actions dangereuses ne sont jamais envoyées, quelle que soit la requête.
+
 ## Développement du plugin
 
 ```powershell
