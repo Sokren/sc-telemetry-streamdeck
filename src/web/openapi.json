@@ -1,0 +1,70 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "SC Telemetry Deck API",
+		"version": "1.0.0",
+		"description": "Local API to read Star Citizen's state and trigger game actions through SC Telemetry Deck. Requires the token shown by the app (Authorization: Bearer …). Dangerous actions (self destruct, eject, opening doors…) are always refused. — FR : API locale pour lire l'état de Star Citizen et déclencher des actions du jeu via SC Telemetry Deck. Demande le jeton affiché par l'appli (Authorization: Bearer …). Les actions dangereuses (autodestruction, éjection, ouverture des portes…) sont toujours refusées.",
+		"license": { "name": "Unofficial community project — projet communautaire non officiel" }
+	},
+	"servers": [{ "url": "http://127.0.0.1:8743", "description": "This PC — ce PC" }],
+	"security": [{ "bearerAuth": [] }],
+	"paths": {
+		"/api/v1/status": {
+			"get": {
+				"operationId": "getStatus",
+				"tags": ["General"],
+				"summary": "App and game status — état de l'appli et du jeu",
+				"description": "Whether telemetry is being received and whether the character has spawned. — FR : indique si la télémétrie est reçue et si le personnage est apparu.",
+				"responses": {
+					"200": { "description": "Status — état", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Status" } } } },
+					"401": { "$ref": "#/components/responses/Unauthorized" }
+				}
+			}
+		},
+		"/api/v1/openapi.json": {
+			"get": {
+				"operationId": "getOpenApi",
+				"tags": ["General"],
+				"summary": "This contract — ce contrat",
+				"description": "OpenAPI description of this API, readable without token. — FR : description OpenAPI de cette API, lisible sans jeton.",
+				"security": [],
+				"responses": {
+					"200": { "description": "OpenAPI document — document OpenAPI", "content": { "application/json": { "schema": { "type": "object" } } } }
+				}
+			}
+		}
+	},
+	"components": {
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"description": "Token shown by the app (settings.json). — FR : jeton affiché par l'appli (settings.json)."
+			}
+		},
+		"responses": {
+			"Unauthorized": {
+				"description": "Missing or wrong token — jeton absent ou faux",
+				"content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+			}
+		},
+		"schemas": {
+			"Error": {
+				"type": "object",
+				"required": ["error"],
+				"properties": { "error": { "type": "string" } }
+			},
+			"Status": {
+				"type": "object",
+				"required": ["app", "version", "telemetry", "character", "schema"],
+				"properties": {
+					"app": { "const": "sc-telemetry-web" },
+					"version": { "type": "string" },
+					"telemetry": { "enum": ["live", "no_data"], "description": "live: frames received in the last 3 s — FR : images reçues dans les 3 dernières secondes" },
+					"character": { "enum": ["spawned", "unknown"] },
+					"schema": { "type": "string", "description": "Game version of the embedded schema — FR : version du jeu du schéma embarqué" }
+				}
+			}
+		}
+	}
+}
