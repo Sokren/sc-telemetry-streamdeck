@@ -1,0 +1,173 @@
+{
+ "vehicle": {
+  "state": {
+   "name": "MISC_Prospector_877602860529",
+   "class_name": "MISC_Prospector",
+   "type": "VEHICLE_TYPE_SPACESHIP",
+   "annunciators": {
+    "pwr": "ANNUNCIATOR_STATE_NOMINAL",
+    "wpn": "ANNUNCIATOR_STATE_NOMINAL",
+    "thr": "ANNUNCIATOR_STATE_OFF",
+    "shld": "ANNUNCIATOR_STATE_MINOR_ON",
+    "cool": "ANNUNCIATOR_STATE_OFF",
+    "qdrv": "ANNUNCIATOR_STATE_OFF",
+    "radr": "ANNUNCIATOR_STATE_NOMINAL",
+    "prox": "ANNUNCIATOR_STATE_NOMINAL",
+    "hit": "ANNUNCIATOR_STATE_NOMINAL",
+    "misl": "ANNUNCIATOR_STATE_NOMINAL"
+   },
+   "flight": {
+    "state": {
+     "is_landed": true,
+     "gear": "VEHICLE_COMPONENT_DEPLOYMENT_STATE_DEPLOYED",
+     "vtol": "VEHICLE_COMPONENT_DEPLOYMENT_STATE_DEPLOYED"
+    },
+    "settings": {
+     "ifcs_coupled": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_esp": {
+      "enabled": true
+     },
+     "ifcs_gravity_compensation": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_g_safe": {
+      "enabled": true
+     },
+     "ifcs_cruise_mode": {},
+     "ifcs_spacebreak_enables_boost": true,
+     "ifcs_speed_limiter": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_proximity_assist": {
+      "enabled": true
+     },
+     "ifcs_proximity_assist_landing": {
+      "enabled": true
+     },
+     "ifcs_stability": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_core": {
+      "enabled": true,
+      "active": true
+     },
+     "course_prediction": true,
+     "ifcs_wind_compensation": {
+      "enabled": true,
+      "active": true
+     },
+     "ifcs_g_safe_disabled_by_boost": true,
+     "ifcs_command_behaviour": {
+      "enabled": true,
+      "active": true
+     }
+    },
+    "instruments": {
+     "speed": 6.3309443e-7,
+     "g_meter": {
+      "max": 1.0003417
+     },
+     "boost": {
+      "reserves": 1
+     },
+     "altitude": 3.4028235e+38,
+     "radar_altitude": 4.433704,
+     "vertical_speed_indicator": 6.3309443e-7,
+     "atmospheric_density": 1.1999913,
+     "heading": 0.001033952
+    }
+   },
+   "power": {
+    "powerplants": true,
+    "weapons": true,
+    "coolers": true,
+    "life_support": true,
+    "sensors": true,
+    "shield_generators": true,
+    "shield_emitters": true
+   },
+   "shields": {
+    "level": 1,
+    "faces": [
+     1
+    ]
+   },
+   "health": 1,
+   "master_mode": {
+    "mode": "VEHICLE_MASTER_MODE_SCM",
+    "spooled": true
+   }
+  }
+ },
+ "weapons": {
+  "settings": {
+   "gimbals_locked": true
+  },
+  "weapons": [
+   {
+    "name": "KLWE_LaserRepeater_S1_877602860581",
+    "is_powered": true,
+    "ready_to_fire": true,
+    "contained_in_preset": true
+   },
+   {
+    "name": "KLWE_LaserRepeater_S1_877602860592",
+    "is_powered": true,
+    "ready_to_fire": true,
+    "contained_in_preset": true
+   }
+  ],
+  "countermeasures": [
+   {
+    "type": "COUNTERMEASURE_TYPE_DECOY",
+    "amount": 48
+   },
+   {
+    "type": "COUNTERMEASURE_TYPE_NOISE",
+    "amount": 5
+   }
+  ]
+ },
+ "actor": {
+  "vitals": {
+   "health": {
+    "current": 100,
+    "max": 100
+   },
+   "oxygen": {
+    "current": 1,
+    "max": 1
+   },
+   "hunger": {
+    "current": 73.05671,
+    "max": 100
+   },
+   "thirst": {
+    "current": 39.57986,
+    "max": 100
+   },
+   "body_temperature": {
+    "current": 36.5,
+    "max": 100
+   },
+   "heart_rate": 60.800385,
+   "gravity": 1.0003417,
+   "pressure": 1
+  },
+  "state": {
+   "locomotion": "ACTOR_LOCOMOTION_STATE_SEATED",
+   "crew_role": "ACTOR_CREW_ROLE_PILOT",
+   "seat_name": "MISC_Prospector_SCItem_Seat_877602860569"
+  },
+  "environment": {
+   "external_temperature": 20.999994,
+   "breathable_atmosphere": true
+  }
+ }
+}
