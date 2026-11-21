@@ -1,6 +1,6 @@
 # SC Telemetry Deck
 
-**EN** English · 🇫🇷 [Français](README.fr.md)
+**EN** English · 🇫🇷 [Français](README.fr.md) · 📜 [Changelog](CHANGELOG.md)
 
 Stream Deck plugin **and standalone web app** for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
 
