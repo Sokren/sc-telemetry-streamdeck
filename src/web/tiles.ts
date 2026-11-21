@@ -86,7 +86,8 @@ export async function pressTile(tile: Tile, ctx: Omit<TileContext, "lang">): Pro
 		case "ship-toggle": {
 			const outcome = await pressShipFunction(shipId(tile.settings.function), modeOf(tile.settings.mode), ctx);
 			if (outcome.status === 200) return { feedback: "ok" };
-			return { feedback: "alert", detail: outcome.json.reason };
+			// Détail indépendant de la langue : code de refus, ou statut renvoyé par le jeu.
+			return { feedback: "alert", detail: outcome.status === 409 ? outcome.json.code : outcome.json.reason };
 		}
 		case "actor-action":
 		case "ship-action": {

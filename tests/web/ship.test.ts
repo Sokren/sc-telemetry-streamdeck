@@ -73,6 +73,16 @@ describe("POST /api/v1/ship/functions/{id}/press", () => {
 		expect(sent).toEqual([]);
 	});
 
+	test("refus : code stable + raison dans la langue demandée (FR / EN)", async () => {
+		const s = await inShip();
+		const en = await s.call("POST", "/api/v1/ship/functions/doors_closed/press?lang=en", { body: { mode: "on" } });
+		expect(en.status).toBe(409);
+		validateResponse("/api/v1/ship/functions/{id}/press", "POST", 409, en.body);
+		expect(en.body).toEqual({ decision: "refused", code: "unavailable", reason: "This ship does not have this function." });
+		const fr = await s.call("POST", "/api/v1/ship/functions/doors_closed/press?lang=fr", { body: { mode: "on" } });
+		expect(fr.body).toEqual({ decision: "refused", code: "unavailable", reason: "Ce vaisseau n'a pas cette fonction." });
+	});
+
 	test("refus du jeu → 502", async () => {
 		const s = await inShip(() => ({ status: 7 }));
 		const r = await s.call("POST", "/api/v1/ship/functions/lights/press", { body: { mode: "on" } });

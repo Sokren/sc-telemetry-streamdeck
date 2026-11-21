@@ -75,7 +75,12 @@ function flash(index, kind) {
 	setTimeout(() => (f.className = "flash"), 600);
 }
 
+// Appuis faits depuis cette page : leur retour diffusé à tous (événement « feedback ») est ignoré ici,
+// la réponse de l'appui suffit (sinon ✔ / ⚠ clignoterait deux fois).
+const ownPresses = new Map();
+
 async function press(index) {
+	ownPresses.set(index, Date.now());
 	try {
 		const r = await fetch(`/api/v1/layout/tiles/${index}/press`, { method: "POST", headers: { authorization: `Bearer ${token}` } });
 		if (r.status === 401) return showMessage(t("badToken"));
@@ -101,6 +106,11 @@ function connect() {
 	});
 	source.addEventListener("feedback", (e) => {
 		const { index, feedback } = JSON.parse(e.data);
+		const mine = ownPresses.get(index);
+		if (mine !== undefined && Date.now() - mine < 3000) {
+			ownPresses.delete(index);
+			return;
+		}
 		flash(index, feedback === "ok" ? "ok" : "alert");
 	});
 	source.onerror = async () => {

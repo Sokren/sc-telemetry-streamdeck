@@ -93,7 +93,7 @@ describe("pressTile", () => {
 
 	test("fonction absente du vaisseau → ⚠ ; afficheur → rien envoyé", async () => {
 		const c = ctx();
-		expect(await pressTile({ type: "ship-toggle", settings: { function: "doors_closed" } }, c)).toMatchObject({ feedback: "alert" });
+		expect(await pressTile({ type: "ship-toggle", settings: { function: "doors_closed" } }, c)).toEqual({ feedback: "alert", detail: "unavailable" });
 		expect(await pressTile({ type: "actor-display", settings: { value: "oxygen" } }, c)).toEqual({ feedback: "ok" });
 		expect(c.game.sent).toEqual([]);
 	});

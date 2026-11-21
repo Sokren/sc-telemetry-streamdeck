@@ -423,6 +423,18 @@
 						"schema": {
 							"$ref": "#/components/schemas/ShipFunctionId"
 						}
+					},
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Language of the refusal reason — FR : langue de la raison de refus"
 					}
 				],
 				"requestBody": {
@@ -1025,14 +1037,24 @@
 				"type": "object",
 				"required": [
 					"decision",
+					"code",
 					"reason"
 				],
 				"properties": {
 					"decision": {
 						"const": "refused"
 					},
+					"code": {
+						"enum": [
+							"unavailable",
+							"no_command",
+							"dangerous_action"
+						],
+						"description": "Stable refusal code — FR : code de refus stable"
+					},
 					"reason": {
-						"type": "string"
+						"type": "string",
+						"description": "Human-readable reason in the requested language (lang) — FR : raison lisible dans la langue demandée (lang)"
 					}
 				}
 			},
