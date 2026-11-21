@@ -1,6 +1,7 @@
 // Page de SC Telemetry Deck : grille de tuiles, onglets Personnage et Vaisseau, état en direct
 // (Server-Sent Events), appuis. Utilise uniquement l'API publique v1 (la même que n'importe quel autre logiciel).
 import { I18N } from "./i18n.js";
+import { createAutoSwitch, parseAutoSettings, POSITIONS } from "./autoswitch.js";
 import { createLan } from "./lan.js";
 import { createView } from "./view.js";
 
@@ -78,6 +79,8 @@ function applyTexts() {
 	$("emotes-hint").textContent = t("emotesHint");
 	myView?.applyTexts();
 	lanPanel?.applyTexts();
+	renderAutoButton();
+	if ($("auto").open) renderAuto();
 }
 
 // ---------- À propos ----------
@@ -155,7 +158,7 @@ function renderTabs() {
 				b.dataset.id = v.id;
 				b.setAttribute("role", "tab");
 				b.setAttribute("aria-controls", "panel-myview");
-				b.addEventListener("click", () => showTab(`view:${v.id}`));
+				b.addEventListener("click", () => userShowTab(`view:${v.id}`));
 				return b;
 			}),
 		);
@@ -199,16 +202,21 @@ function showTab(name) {
 	myView?.show(viewId(name));
 	myView?.setVisible(viewId(name) !== null);
 }
-for (const tab of TABS) $(`tab-${tab}`).addEventListener("click", () => showTab(tab));
+/** Onglet choisi à la main : le changement de vue automatique le respecte jusqu'au prochain changement de position. */
+function userShowTab(name) {
+	autoSwitch?.userNavigated();
+	showTab(name);
+}
+for (const tab of TABS) $(`tab-${tab}`).addEventListener("click", () => userShowTab(tab));
 
 async function addView() {
 	const id = await myView.addView();
 	if (!id) return renderTabs();
-	showTab(`view:${id}`);
+	userShowTab(`view:${id}`);
 	myView.editName();
 }
 $("view-add").addEventListener("click", addView);
-$("tab-select").addEventListener("change", (e) => (e.target.value === ADD ? addView() : showTab(e.target.value)));
+$("tab-select").addEventListener("change", (e) => (e.target.value === ADD ? addView() : userShowTab(e.target.value)));
 
 // ---------- Grille ----------
 function tileButton(index) {
@@ -401,6 +409,7 @@ function connect() {
 		renderCharacter(lastState.character);
 		renderShip(lastState.shipStatus, lastState.ship);
 		myView?.setState(lastState);
+		autoSwitch?.update(lastState.character.locomotion);
 	});
 	source.addEventListener("views", (e) => myView?.setViews(JSON.parse(e.data).views));
 	source.addEventListener("feedback", (e) => {
@@ -448,6 +457,8 @@ $("lang").addEventListener("click", () => {
 // ---------- Ma vue ----------
 const myView = createView({
 	t,
+	// Vue reverrouillée : un changement automatique en attente peut se faire.
+	onLockChange: (unlocked) => !unlocked && autoSwitch?.retry(),
 	token: () => token,
 	lang: () => lang,
 	onViewsChanged(list) {
@@ -466,6 +477,98 @@ const myView = createView({
 	triggerAction: triggerEmote,
 	showMessage,
 	storage: { get: storageGet, set: storageSet },
+});
+
+// ---------- Changement de vue automatique (réglage propre à cet appareil) ----------
+const AUTO_KEY = "sctd-autoswitch";
+let autoSettings = parseAutoSettings(storageGet(AUTO_KEY));
+const autoSwitch = createAutoSwitch({
+	getSettings: () => autoSettings,
+	// Cible : onglet Personnage / Vaisseau, ou une vue (`view:<id>`) qui existe encore.
+	viewExists: (target) => target === "character" || target === "ship" || !!viewTabs?.some((v) => `view:${v.id}` === target),
+	isEditing: () => !!myView?.isEditing(),
+	// Une vue laissée déverrouillée sur un autre onglet est reverrouillée : pas d'ouverture en mode édition.
+	apply: (target) => {
+		myView.lock();
+		showTab(target);
+	},
+	// Page ouverte par un lien vers une vue (QR code) : on garde cette vue au départ.
+	skipInitial: !!viewParam,
+});
+
+function renderAutoButton() {
+	const b = $("auto-open");
+	b.textContent = autoSettings.enabled ? t("autoButtonOn") : t("autoButton");
+	b.classList.toggle("on", autoSettings.enabled);
+	b.title = t("autoTitle");
+}
+
+function saveAuto(next) {
+	autoSettings = next;
+	storageSet(AUTO_KEY, JSON.stringify(next));
+	renderAutoButton();
+	autoSwitch.settingsChanged();
+}
+
+function renderAuto() {
+	const el = (tag, cls, text) => {
+		const e = document.createElement(tag);
+		if (cls) e.className = cls;
+		if (text !== undefined) e.textContent = text;
+		return e;
+	};
+	const box = el("div", `lan-dlg${autoSettings.enabled ? " on" : ""}`);
+	const title = el("h2", "", t("autoTitle"));
+	title.id = "auto-title";
+	box.append(title, el("p", "lan-sub", t("autoSub")));
+	const sw = el("label", "lan-sw");
+	const input = el("input");
+	input.type = "checkbox";
+	input.setAttribute("role", "switch");
+	input.checked = autoSettings.enabled;
+	input.addEventListener("change", () => {
+		saveAuto({ ...autoSettings, enabled: input.checked });
+		renderAuto();
+	});
+	const text = el("div");
+	text.append(el("b", "", t("autoEnable")), el("small", "", autoSettings.enabled ? t("autoOn") : t("autoOff")));
+	sw.append(input, el("span", "lan-tog"), text);
+	box.append(sw);
+	const rows = el("div", "auto-rows");
+	const labels = { on_foot: "posOnFoot", seated: "posSeated", eva: "posEva" };
+	for (const pos of POSITIONS) {
+		const row = el("label", "auto-row");
+		row.append(el("span", "", t(labels[pos])));
+		const select = el("select");
+		const targets = [
+			["", t("autoNoChange")],
+			["character", t("tabCharacter")],
+			["ship", t("tabShip")],
+			...(viewTabs ?? []).map((v) => [`view:${v.id}`, v.name || t("viewNameEmpty")]),
+		];
+		for (const [value, label] of targets) {
+			const o = el("option", "", label);
+			o.value = value;
+			select.append(o);
+		}
+		select.value = targets.some(([value]) => value === autoSettings[pos]) ? autoSettings[pos] : "";
+		select.addEventListener("change", () => saveAuto({ ...autoSettings, [pos]: select.value }));
+		row.append(select);
+		rows.append(row);
+	}
+	box.append(rows, el("p", "lan-off-note", t("autoNote")));
+	const foot = el("form", "lan-foot");
+	foot.method = "dialog";
+	const close = el("button", "", t("close"));
+	close.type = "submit";
+	foot.append(close);
+	box.append(foot);
+	$("auto").replaceChildren(box);
+}
+
+$("auto-open").addEventListener("click", () => {
+	$("auto").showModal();
+	renderAuto();
 });
 
 // ---------- Tablette / téléphone (PC seulement) ----------

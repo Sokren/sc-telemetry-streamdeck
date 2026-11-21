@@ -12,7 +12,7 @@ const DRAG_THRESHOLD = 6;
 const UNLOCK_KEY = "sctd-view-unlocked";
 const EMOTES = "player_emotes";
 /** Valeurs affichées en jauge (barre), pour le type indiqué dans le menu « Ajouter ». */
-const GAUGES = ["health", "oxygen", "hunger", "thirst", "body_temperature", "shields", "hull", "decoys", "noise", "hydrogen", "quantum"];
+const GAUGES = ["health", "oxygen", "hunger", "thirst", "body_temperature", "shields", "hull", "decoys", "noise", "weapons_ready", "hydrogen", "quantum"];
 
 const el = (tag, cls, text) => {
 	const e = document.createElement(tag);
@@ -616,6 +616,7 @@ export function createView(ctx) {
 		ctx.storage.set(UNLOCK_KEY, unlocked ? "1" : "0");
 		renderLock();
 		render();
+		ctx.onLockChange?.(unlocked);
 	}
 
 	// ---------- Entrées depuis app.js ----------
@@ -663,6 +664,16 @@ export function createView(ctx) {
 			} catch {
 				return fail("viewSaveFailed");
 			}
+		},
+		/** Une vue est affichée et déverrouillée (édition en cours). */
+		isEditing() {
+			return visible && unlocked;
+		},
+		/** Reverrouille (enregistrement en attente envoyé d'abord) : avant un changement de vue automatique. */
+		lock() {
+			if (!unlocked) return;
+			if (saveTimer) save();
+			setUnlocked(false);
 		},
 		/** Déverrouille et place le curseur dans le nom (vue tout juste créée). */
 		editName() {

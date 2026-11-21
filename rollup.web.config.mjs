@@ -16,7 +16,7 @@ const copies = [
 	["src/web/openapi.json", `${out}/openapi.json`],
 	["schema/sc_extrait.desc", `${out}/data/sc_extrait.desc`],
 	["schema/actions.json", `${out}/data/actions.json`],
-	...["index.html", "app.js", "view.js", "lan.js", "i18n.js", "style.css"].map((f) => [`src/web/static/${f}`, `${out}/static/${f}`]),
+	...["index.html", "app.js", "view.js", "lan.js", "autoswitch.js", "i18n.js", "style.css"].map((f) => [`src/web/static/${f}`, `${out}/static/${f}`]),
 	...["swagger-ui.css", "swagger-ui-bundle.js", "favicon-32x32.png"].map((f) => [path.join(swaggerDir, f), `${out}/swagger/${f}`]),
 ];
 
