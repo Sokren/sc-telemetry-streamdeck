@@ -2,7 +2,7 @@
 	"openapi": "3.1.0",
 	"info": {
 		"title": "SC Telemetry Deck API",
-		"version": "1.0.0",
+		"version": "1.1.0",
 		"description": "Local API to read Star Citizen's state and trigger game actions through SC Telemetry Deck. Requires the token shown by the app (Authorization: Bearer …). Dangerous actions (self destruct, eject, opening doors…) are always refused. — FR : API locale pour lire l'état de Star Citizen et déclencher des actions du jeu via SC Telemetry Deck. Demande le jeton affiché par l'appli (Authorization: Bearer …). Les actions dangereuses (autodestruction, éjection, ouverture des portes…) sont toujours refusées.",
 		"license": {
 			"name": "Unofficial community project — projet communautaire non officiel"
