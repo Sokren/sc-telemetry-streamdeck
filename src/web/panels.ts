@@ -1,6 +1,8 @@
 import type { Lang } from "../catalog/labels.js";
 import type { CountermeasureTracker } from "../display/countermeasures.js";
+import { gimbalsWord, groupText } from "../display/ship-values.js";
 import { DISPLAY_VALUES } from "../display/values.js";
+import { readWeapons } from "../display/weapons.js";
 import en from "./labels.en.json" with { type: "json" };
 import fr from "./labels.fr.json" with { type: "json" };
 import { vitalOf, type Vital } from "./routes/vitals.js";
@@ -49,7 +51,7 @@ export function characterOf(actor: Obj | undefined, lang: Lang): Character {
 	};
 }
 
-export type InstrumentId = "shields" | "hull" | "decoys" | "noise" | "hydrogen" | "quantum" | "speed" | "radar_altitude" | "heading";
+export type InstrumentId = "shields" | "hull" | "decoys" | "noise" | "weapons_ready" | "weapon_group" | "gimbals" | "hydrogen" | "quantum" | "speed" | "radar_altitude" | "heading";
 export type Instrument = { id: InstrumentId; label: string; text: string; unit: string; percent?: number; level: Level };
 export type AnnunciatorId = "pwr" | "wpn" | "thr" | "shld" | "cool" | "qdrv" | "radr" | "prox" | "hit" | "misl";
 export type Annunciator = {
@@ -68,7 +70,7 @@ export type ShipStatus = {
 	annunciators: Annunciator[];
 };
 
-export const INSTRUMENTS: readonly InstrumentId[] = ["shields", "hull", "decoys", "noise", "hydrogen", "quantum", "speed", "radar_altitude", "heading"];
+export const INSTRUMENTS: readonly InstrumentId[] = ["shields", "hull", "decoys", "noise", "weapons_ready", "weapon_group", "gimbals", "hydrogen", "quantum", "speed", "radar_altitude", "heading"];
 const ANNUNCIATORS: readonly AnnunciatorId[] = ["pwr", "wpn", "thr", "shld", "cool", "qdrv", "radr", "prox", "hit", "misl"];
 const MASTER: Record<string, "nav" | "scm" | "stealth"> = {
 	VEHICLE_MASTER_MODE_NAVIGATION: "nav",
@@ -128,6 +130,17 @@ export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, l
 		if (!r?.available) return none(id);
 		return { id, label: t.instruments[id], text: String(r.amount), unit: "", percent: r.percent, level: r.level };
 	};
+	// Armes : même règle (section `weapons` fraîche, perso assis), affichage seulement.
+	const weapon = (id: "weapons_ready" | "weapon_group" | "gimbals"): Instrument => {
+		const w = cm ? readWeapons({ weapons: cm.weapons, actor }) : undefined;
+		if (!w?.available || !w.total) return none(id);
+		const label = t.instruments[id];
+		if (id === "weapon_group") return { id, label, text: groupText(w.group, lang), unit: "", level: "none" };
+		if (id === "gimbals") return { id, label, text: gimbalsWord(w.gimbalsLocked, lang), unit: "", level: "none" };
+		return { id, label, text: `${w.ready} / ${w.total}`, unit: "", percent: w.percent, level: w.level };
+	};
+	const fromWeapons = (id: InstrumentId): Instrument | undefined =>
+		id === "decoys" || id === "noise" ? countermeasure(id) : id === "weapons_ready" || id === "weapon_group" || id === "gimbals" ? weapon(id) : undefined;
 	if (!state) {
 		return {
 			available: false,
@@ -135,7 +148,7 @@ export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, l
 			landed: null,
 			masterMode: null,
 			masterModeLabel: "—",
-			instruments: INSTRUMENTS.map((id) => (id === "decoys" || id === "noise" ? countermeasure(id) : none(id))),
+			instruments: INSTRUMENTS.map((id) => fromWeapons(id) ?? none(id)),
 			annunciators: ANNUNCIATORS.map((id) => ({ id, label: t.annunciators[id], state: "unknown", flashing: false })),
 		};
 	}
@@ -154,6 +167,9 @@ export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, l
 		gauge("hull", num(state.health)),
 		countermeasure("decoys"),
 		countermeasure("noise"),
+		weapon("weapons_ready"),
+		weapon("weapon_group"),
+		weapon("gimbals"),
 		gauge("hydrogen", instr ? num(instr.hydrogen_fuel) : undefined),
 		gauge("quantum", instr ? num(instr.quantum_fuel) : undefined),
 		plain("speed", instr ? num(instr.speed) : undefined, "m/s"),

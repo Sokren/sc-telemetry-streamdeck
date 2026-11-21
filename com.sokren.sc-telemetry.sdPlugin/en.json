@@ -20,7 +20,7 @@
 	},
 	"com.sokren.sc-telemetry.ship-display": {
 		"Name": "Ship Display",
-		"Tooltip": "Shows the ship's countermeasures (decoys / noise) with a colored gauge.",
+		"Tooltip": "Shows the ship's countermeasures, weapons ready, weapon group or gimbals, with a colored gauge.",
 		"Encoder": {
 			"TriggerDescription": {
 				"Rotate": "Change value"

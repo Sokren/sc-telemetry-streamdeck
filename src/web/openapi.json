@@ -1228,7 +1228,7 @@
 					"Ship"
 				],
 				"summary": "Ship instruments and warning lights — instruments et voyants du vaisseau",
-				"description": "Ship name, landed, master mode, instruments (shields, hull, decoys and noise countermeasures — count, percent of the largest stock seen for this ship model —, hydrogen, quantum fuel, speed, radar altitude, heading) and the 10 warning lights, as shown in the Ship tab of the page. available: false outside a ship (character not seated) or when the game is closed; decoys and noise can still show while the ship section is late, as on the Stream Deck key. — FR : nom du vaisseau, posé, mode maître, instruments (boucliers, coque, leurres et brouilleurs — nombre, pourcentage du plus grand stock vu pour ce modèle de vaisseau —, hydrogène, quantum, vitesse, altitude radar, cap) et les 10 voyants, comme dans l'onglet Vaisseau de la page. available: false hors du vaisseau (perso pas assis) ou si le jeu est fermé ; leurres et brouilleurs peuvent rester affichés si la section vaisseau est en retard, comme sur la touche Stream Deck.",
+				"description": "Ship name, landed, master mode, instruments (shields, hull, decoys and noise countermeasures — count, percent of the largest stock seen for this ship model —, weapons ready to fire, active weapon group, gimbals (display only), hydrogen, quantum fuel, speed, radar altitude, heading) and the 10 warning lights, as shown in the Ship tab of the page. available: false outside a ship (character not seated) or when the game is closed; countermeasure and weapon instruments can still show while the ship section is late, as on the Stream Deck key. — FR : nom du vaisseau, posé, mode maître, instruments (boucliers, coque, leurres et brouilleurs — nombre, pourcentage du plus grand stock vu pour ce modèle de vaisseau —, armes prêtes à tirer, groupe d’armes actif, cardans (affichage seulement), hydrogène, quantum, vitesse, altitude radar, cap) et les 10 voyants, comme dans l'onglet Vaisseau de la page. available: false hors du vaisseau (perso pas assis) ou si le jeu est fermé ; les instruments de contre-mesures et d’armes peuvent rester affichés si la section vaisseau est en retard, comme sur la touche Stream Deck.",
 				"parameters": [
 					{
 						"name": "lang",
@@ -1789,6 +1789,9 @@
 							"hull",
 							"decoys",
 							"noise",
+							"weapons_ready",
+							"weapon_group",
+							"gimbals",
 							"hydrogen",
 							"quantum",
 							"speed",
@@ -1938,7 +1941,7 @@
 					},
 					"ref": {
 						"type": "string",
-						"description": "vital: a vital id; instrument: shields, hull, decoys, noise, hydrogen, quantum, speed, radar_altitude, heading; ship_info: name, master_mode, landed; character_info: position, role, seat; ship_function: a ship function id; action: a game action name (dangerous actions refused); none for annunciators — FR : vital : une constante ; instrument : shields, hull, decoys, noise, hydrogen, quantum, speed, radar_altitude, heading ; ship_info : name, master_mode, landed ; character_info : position, role, seat ; ship_function : une fonction vaisseau ; action : nom d’action du jeu (actions dangereuses refusées) ; rien pour annunciators"
+						"description": "vital: a vital id; instrument: shields, hull, decoys, noise, weapons_ready, weapon_group, gimbals, hydrogen, quantum, speed, radar_altitude, heading; ship_info: name, master_mode, landed; character_info: position, role, seat; ship_function: a ship function id; action: a game action name (dangerous actions refused); none for annunciators — FR : vital : une constante ; instrument : shields, hull, decoys, noise, weapons_ready, weapon_group, gimbals, hydrogen, quantum, speed, radar_altitude, heading ; ship_info : name, master_mode, landed ; character_info : position, role, seat ; ship_function : une fonction vaisseau ; action : nom d’action du jeu (actions dangereuses refusées) ; rien pour annunciators"
 					},
 					"size": {
 						"enum": [

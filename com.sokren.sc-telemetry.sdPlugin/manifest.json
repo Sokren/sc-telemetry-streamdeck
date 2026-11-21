@@ -63,7 +63,7 @@
 			"Name": "Ship Display",
 			"UUID": "com.sokren.sc-telemetry.ship-display",
 			"Icon": "imgs/actions/ship-display/icon",
-			"Tooltip": "Shows the ship's countermeasures (decoys / noise) with a colored gauge.",
+			"Tooltip": "Shows the ship's countermeasures, weapons ready, weapon group or gimbals, with a colored gauge.",
 			"PropertyInspectorPath": "ui/ship-display.html",
 			"Controllers": [
 				"Keypad",

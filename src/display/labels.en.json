@@ -1,6 +1,8 @@
 {
 	"yes": "Yes",
 	"no": "No",
+	"allWeapons": "All",
+	"gimbals": { "locked": "Locked", "free": "Free" },
 	"values": {
 		"health": { "short": "Health", "long": "Health" },
 		"oxygen": { "short": "O₂", "long": "Oxygen" },
@@ -17,6 +19,9 @@
 		"balance": { "short": "Funds", "long": "Balance" },
 		"countermeasures": { "short": "Counterm.", "long": "Countermeasures (decoys / noise)" },
 		"decoys": { "short": "Decoys", "long": "Decoys" },
-		"noise": { "short": "Noise", "long": "Noise" }
+		"noise": { "short": "Noise", "long": "Noise" },
+		"weapons": { "short": "Weapons", "long": "Weapons ready to fire" },
+		"weapon_group": { "short": "Group", "long": "Active weapon group" },
+		"gimbals": { "short": "Gimbals", "long": "Gimbals" }
 	}
 }

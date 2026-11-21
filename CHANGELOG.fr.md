@@ -9,6 +9,13 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/) ; les note
 > **Bêta** — l'API de télémétrie du jeu est récente, non documentée par CIG et peut changer à chaque patch.
 > 4.10.3 (LIVE) = affichage seulement, 5.0 (PTU) = affichage + actions.
 
+## [Non publié]
+
+### Ajouté
+- **Ship Display** : **armes prêtes à tirer** (« 1 / 2 », jauge colorée), **groupe d'armes actif** et **cardans** (fixes / libres). Affichage seulement.
+- Appli web : instruments **Armes prêtes**, **Groupe d'armes** et **Cardans** (onglet Vaisseau, API, vues).
+- Appli web : **🔁 Auto** — changement de vue automatique par appareil : vue à pied / assis / EVA, après 2 s dans la même position, jamais pendant l'édition ; un onglet changé à la main est gardé jusqu'au prochain changement de position.
+
 ## [0.3.5] — 2026-11-21
 
 ### Ajouté

@@ -1,6 +1,8 @@
 {
 	"yes": "Oui",
 	"no": "Non",
+	"allWeapons": "Toutes",
+	"gimbals": { "locked": "Fixes", "free": "Libres" },
 	"values": {
 		"health": { "short": "Santé", "long": "Santé" },
 		"oxygen": { "short": "O₂", "long": "Oxygène" },
@@ -17,6 +19,9 @@
 		"balance": { "short": "Solde", "long": "Solde" },
 		"countermeasures": { "short": "C-mesures", "long": "Contre-mesures (leurres / brouilleurs)" },
 		"decoys": { "short": "Leurres", "long": "Leurres" },
-		"noise": { "short": "Brouill.", "long": "Brouilleurs" }
+		"noise": { "short": "Brouill.", "long": "Brouilleurs" },
+		"weapons": { "short": "Armes", "long": "Armes prêtes à tirer" },
+		"weapon_group": { "short": "Groupe", "long": "Groupe d'armes actif" },
+		"gimbals": { "short": "Cardans", "long": "Cardans" }
 	}
 }

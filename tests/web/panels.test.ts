@@ -60,7 +60,7 @@ describe("shipStatusOf", () => {
 		expect(by.speed).toMatchObject({ text: "0", unit: "m/s", level: "none" });
 		expect(by.radar_altitude).toMatchObject({ text: "4", unit: "m" });
 		expect(by.heading).toMatchObject({ text: "0", unit: "°" });
-		expect(s.instruments.map((i) => i.id)).toEqual(["shields", "hull", "decoys", "noise", "hydrogen", "quantum", "speed", "radar_altitude", "heading"]);
+		expect(s.instruments.map((i) => i.id)).toEqual(["shields", "hull", "decoys", "noise", "weapons_ready", "weapon_group", "gimbals", "hydrogen", "quantum", "speed", "radar_altitude", "heading"]);
 	});
 
 	test("voyants : 10, état et clignotement", () => {
@@ -131,5 +131,23 @@ describe("shipStatusOf", () => {
 		expect(s.instruments.find((i) => i.id === "decoys")).toMatchObject({ text: "45" });
 		const onFoot = shipStatusOf(undefined, { state: { locomotion: "ACTOR_LOCOMOTION_STATE_ON_FOOT" } }, "fr", { weapons, tracker });
 		expect(onFoot.instruments.find((i) => i.id === "decoys")).toMatchObject({ text: "—" });
+	});
+
+	test("armes (Prospector) : prêtes / total, groupe, cardans ; « — » sans section weapons", () => {
+		const tracker = new CountermeasureTracker();
+		const gun = (ready: boolean) => ({ name: "KLWE_LaserRepeater_S1_1", is_powered: true, ...(ready ? { ready_to_fire: true } : {}) });
+		const s = shipStatusOf(titan.vehicle, titan.actor, "fr", {
+			weapons: { settings: { gimbals_locked: true }, weapons: [gun(true), gun(false)] },
+			tracker,
+		});
+		const by = Object.fromEntries(s.instruments.map((i) => [i.id, i]));
+		expect(by.weapons_ready).toMatchObject({ label: "Armes prêtes", text: "1 / 2", unit: "", percent: 50, level: "warn" });
+		expect(by.weapon_group).toMatchObject({ label: "Groupe d'armes", text: "Toutes", level: "none" });
+		expect(by.gimbals).toMatchObject({ label: "Cardans", text: "Fixes", level: "none" });
+		const en = shipStatusOf(titan.vehicle, titan.actor, "en", { weapons: { preset_name: "Missiles", weapons: [gun(true)] }, tracker });
+		expect(en.instruments.find((i) => i.id === "weapon_group")).toMatchObject({ label: "Weapon group", text: "Missiles" });
+		expect(en.instruments.find((i) => i.id === "gimbals")).toMatchObject({ text: "Free" });
+		const none = shipStatusOf(titan.vehicle, titan.actor, "fr", { tracker });
+		for (const id of ["weapons_ready", "weapon_group", "gimbals"]) expect(none.instruments.find((i) => i.id === id)).toMatchObject({ text: "—" });
 	});
 });

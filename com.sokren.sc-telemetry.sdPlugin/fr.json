@@ -20,7 +20,7 @@
 	},
 	"com.sokren.sc-telemetry.ship-display": {
 		"Name": "Ship Display",
-		"Tooltip": "Affiche les contre-mesures du vaisseau (leurres / brouilleurs) avec une jauge colorée.",
+		"Tooltip": "Affiche les contre-mesures, les armes prêtes, le groupe d'armes ou les cardans du vaisseau, avec une jauge colorée.",
 		"Encoder": {
 			"TriggerDescription": {
 				"Rotate": "Changer de donnée"

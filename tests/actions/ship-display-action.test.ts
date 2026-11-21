@@ -141,14 +141,18 @@ describe("Ship Display", () => {
 		expect(key.sent.at(-1)).toBe("image:Brouill.|5");
 	});
 
-	test("molette : +1 et −1 en boucle sur les 3 valeurs, réglage enregistré", async () => {
+	test("molette : +1 et −1 en boucle sur les 6 valeurs, réglage enregistré", async () => {
 		const dial = new FakeAction("d1", true);
 		await appear(dial, { value: "noise" });
 		dial.settings = { value: "noise" };
 		await rotate(dial, 1);
+		expect(dial.settings).toEqual({ value: "weapons" });
+		await rotate(dial, 2);
+		expect(dial.settings).toEqual({ value: "gimbals" });
+		await rotate(dial, 1);
 		expect(dial.settings).toEqual({ value: "countermeasures" });
 		await rotate(dial, -1);
-		expect(dial.settings).toEqual({ value: "noise" });
+		expect(dial.settings).toEqual({ value: "gimbals" });
 	});
 
 	test("disparition → désabonnement", async () => {
@@ -158,7 +162,7 @@ describe("Ship Display", () => {
 		expect(hub.listeners.size).toBe(0);
 	});
 
-	test("getValues → 3 valeurs, libellés longs en français", async () => {
+	test("getValues → 6 valeurs, libellés longs en français", async () => {
 		await action.onSendToPlugin({ action: new FakeAction("k1"), payload: { event: "getValues" } } as unknown as SendToPluginEvent<JsonValue, ShipDisplaySettings>);
 		expect(toPI[0]).toEqual({
 			event: "getValues",
@@ -166,6 +170,9 @@ describe("Ship Display", () => {
 				{ label: "Contre-mesures (leurres / brouilleurs)", value: "countermeasures" },
 				{ label: "Leurres", value: "decoys" },
 				{ label: "Brouilleurs", value: "noise" },
+				{ label: "Armes prêtes à tirer", value: "weapons" },
+				{ label: "Groupe d'armes actif", value: "weapon_group" },
+				{ label: "Cardans", value: "gimbals" },
 			],
 		});
 	});

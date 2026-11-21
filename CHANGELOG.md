@@ -9,6 +9,13 @@ and on the [GitHub releases page](https://github.com/Sokren/sc-telemetry-streamd
 > **Beta** — the game's telemetry API is new, undocumented by CIG and may change with any patch.
 > 4.10.3 (LIVE) = display only, 5.0 (PTU) = display + actions.
 
+## [Unreleased]
+
+### Added
+- **Ship Display**: **weapons ready to fire** ("1 / 2", colored gauge), **active weapon group** and **gimbals** (locked / free). Display only.
+- Web app: **Weapons ready**, **Weapon group** and **Gimbals** instruments (Ship tab, API, views).
+- Web app: **🔁 Auto** — automatic view change per device: on foot / seated / EVA view, after 2 s in the same position, never while editing; a tab changed by hand is kept until the next change of position.
+
 ## [0.3.5] — 2026-11-21
 
 ### Added

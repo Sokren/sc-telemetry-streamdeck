@@ -41,7 +41,7 @@ describe("GET /api/v1/ship/status", () => {
 		expect(r.status).toBe(200);
 		validateResponse("/api/v1/ship/status", "GET", 200, r.body);
 		expect(r.body).toMatchObject({ available: true, name: "Avenger Titan", landed: true, masterModeLabel: "SCM" });
-		expect(r.body.instruments).toHaveLength(9);
+		expect(r.body.instruments).toHaveLength(12);
 		expect(r.body.annunciators).toHaveLength(10);
 	});
 
