@@ -9,7 +9,7 @@ import { createApp } from "./app.js";
 import { loadSettings } from "./config.js";
 import { staticFiles } from "./static-files.js";
 
-export const VERSION = "0.3.2";
+export const VERSION = "0.3.3";
 
 export type ServerOptions = {
 	settingsDir: string;
