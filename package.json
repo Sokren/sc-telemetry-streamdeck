@@ -8,7 +8,8 @@
         "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart com.sokren.sc-telemetry\"",
         "test": "vitest run",
         "build:web": "rollup -c rollup.web.config.mjs",
-        "start:web": "node dist-web/server.mjs"
+        "start:web": "node dist-web/server.mjs",
+        "build:exe": "node scripts/build-exe.mjs"
     },
     "engines": {
         "node": ">=24"
@@ -29,6 +30,7 @@
         "@tsconfig/node20": "^20.1.11",
         "@types/node": "~24.1.0",
         "ajv": "^8.20.0",
+        "postject": "^1.0.0-alpha.6",
         "rollup": "^4.68.7",
         "tslib": "^2.9.1",
         "typescript": "^5.9.3",

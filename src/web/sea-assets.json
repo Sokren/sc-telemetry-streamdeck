@@ -1,0 +1,12 @@
+[
+	"static/index.html",
+	"static/app.js",
+	"static/i18n.js",
+	"static/style.css",
+	"openapi.json",
+	"data/sc_extrait.desc",
+	"data/actions.json",
+	"swagger/swagger-ui.css",
+	"swagger/swagger-ui-bundle.js",
+	"swagger/favicon-32x32.png"
+]

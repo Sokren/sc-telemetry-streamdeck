@@ -1,18 +1,28 @@
-// Point d'entrée de l'appli web autonome (dist-web/server.mjs). Indépendant du plugin Stream Deck.
+// Point d'entrée de l'appli web autonome : `node dist-web/server.mjs`, ou `sc-telemetry-web.exe`.
+// Indépendant du plugin Stream Deck.
+import os from "node:os";
 import path from "node:path";
+import sea from "node:sea";
 import { fileURLToPath } from "node:url";
 import { defaultSettingsDir } from "./config.js";
-import { startServer } from "./server-core.js";
+import { prepareFiles } from "./sea.js";
+import { startServer, VERSION } from "./server-core.js";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
+const isSea = sea.isSea();
 const noOpen = process.argv.includes("--no-open");
+
+const files = prepareFiles({
+	isSea,
+	scriptDir: isSea ? path.dirname(process.execPath) : path.dirname(fileURLToPath(import.meta.url)),
+	exeDir: path.dirname(process.execPath),
+	cacheDir: path.join(process.env.LOCALAPPDATA ?? os.tmpdir(), "SC Telemetry Deck", "app"),
+	version: VERSION,
+	getAsset: (key) => sea.getAsset(key),
+});
 
 startServer({
 	settingsDir: defaultSettingsDir(),
-	dataDir: path.join(here, "data"),
-	staticDir: path.join(here, "static"),
-	openapiFile: path.join(here, "openapi.json"),
-	swaggerDir: path.join(here, "swagger"),
+	...files,
 	openBrowser: !noOpen,
 	log: (msg) => console.log(msg),
 }).then(
@@ -21,6 +31,7 @@ startServer({
 		if (err.code === "EADDRINUSE") {
 			console.error("Le port est déjà utilisé : l'appli tourne peut-être déjà. / Port already in use: the app may already be running.");
 		} else console.error(err);
-		process.exit(1);
+		// Exécutable lancé par double-clic : laisser le temps de lire le message avant que la fenêtre se ferme.
+		setTimeout(() => process.exit(1), isSea ? 15_000 : 0);
 	},
 );

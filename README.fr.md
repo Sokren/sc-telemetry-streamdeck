@@ -27,7 +27,7 @@ Plugin Stream Deck **et appli web autonome** pour **Star Citizen**, basés sur l
 1. **Active la télémétrie dans Star Citizen** — [voir les étapes ci-dessous](#activer-la-télémétrie-dans-star-citizen) (une ligne dans `user.cfg`).
 2. Télécharge les fichiers de la dernière [release](../../releases/latest) :
    - **Plugin Stream Deck** : `com.sokren.sc-telemetry.streamDeckPlugin` — double-clique dessus, le logiciel Stream Deck l'installe. Les actions apparaissent dans la catégorie **Star Citizen**.
-   - **Appli web** (sans Stream Deck) : `sc-telemetry-web-X.Y.Z.zip` — décompresse-le, puis lance `node server.mjs` dans ce dossier ([Node.js 24](https://nodejs.org) nécessaire pour l'instant). La page s'ouvre dans ton navigateur.
+   - **Appli web** (sans Stream Deck) : `sc-telemetry-web.exe` — un seul fichier, rien à installer. Double-clique dessus : la page s'ouvre dans ton navigateur. Windows peut afficher un avertissement SmartScreen la première fois (le fichier n'est pas signé) : *Informations complémentaires → Exécuter quand même*. Après un patch du jeu, tu peux poser un `sc_extrait.desc` / `actions.json` à jour à côté de l'exe.
 
 ## Prérequis
 
@@ -106,12 +106,13 @@ Pour les joueurs **sans Stream Deck** : les mêmes boutons et afficheurs dans un
 npm install
 npm run build:web
 npm run start:web        # ouvre la page dans le navigateur (ajouter -- --no-open pour ne pas l'ouvrir)
+npm run build:exe        # fabrique dist\sc-telemetry-web.exe (un seul fichier, Node SEA)
 ```
 
 - Page : `http://127.0.0.1:8743/` — l'appli l'ouvre avec le jeton d'accès inclus. Trois onglets : **Grille** (boutons), **Personnage** (position, rôle et les 13 constantes) et **Vaisseau** (instruments, voyants et les 17 fonctions, cliquables).
 - Swagger UI : `http://127.0.0.1:8743/api/docs` — contrat : `/api/v1/openapi.json`.
 - Chaque appel à l'API demande le jeton (`Authorization: Bearer …`), enregistré dans `%APPDATA%\SC Telemetry Deck\settings.json`.
-- Cet aperçu n'écoute que **sur ce PC** (`127.0.0.1`). L'accès tablette / téléphone (QR code), la grille modifiable et l'exécutable `.exe` arrivent aux étapes suivantes.
+- Cet aperçu n'écoute que **sur ce PC** (`127.0.0.1`). L'accès tablette / téléphone (QR code) et la grille modifiable arrivent aux étapes suivantes.
 - Mêmes règles de sécurité que le plugin : les actions dangereuses ne sont jamais envoyées, quelle que soit la requête.
 
 ## Développement du plugin

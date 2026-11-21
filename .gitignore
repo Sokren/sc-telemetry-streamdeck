@@ -8,6 +8,7 @@ CLAUDE.local.md
 node_modules/
 dist/
 dist-web/
+dist-exe/
 *.sdPlugin/bin/
 *.sdPlugin/logs/
 *.sdPlugin/data/

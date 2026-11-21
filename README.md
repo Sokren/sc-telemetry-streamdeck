@@ -27,7 +27,7 @@ Stream Deck plugin **and standalone web app** for **Star Citizen**, built on the
 1. **Enable telemetry in Star Citizen** — [see the steps below](#enabling-telemetry-in-star-citizen) (one line in `user.cfg`).
 2. Download the files from the latest [release](../../releases/latest):
    - **Stream Deck plugin**: `com.sokren.sc-telemetry.streamDeckPlugin` — double-click it, the Stream Deck app installs it. The actions appear under the **Star Citizen** category.
-   - **Web app** (no Stream Deck needed): `sc-telemetry-web-X.Y.Z.zip` — unzip it, then run `node server.mjs` in that folder ([Node.js 24](https://nodejs.org) required for now). The page opens in your browser.
+   - **Web app** (no Stream Deck needed): `sc-telemetry-web.exe` — a single file, nothing to install. Double-click it: the page opens in your browser. Windows may show a SmartScreen warning the first time (the file isn't signed): *More info → Run anyway*. After a game patch, you can drop an updated `sc_extrait.desc` / `actions.json` next to the exe.
 
 ## Requirements
 
@@ -106,12 +106,13 @@ For players **without a Stream Deck**: the same buttons and displays in a browse
 npm install
 npm run build:web
 npm run start:web        # opens the page in your browser (add -- --no-open to skip)
+npm run build:exe        # builds dist\sc-telemetry-web.exe (single file, Node SEA)
 ```
 
 - Page: `http://127.0.0.1:8743/` — the app opens it with the access token included. Three tabs: **Grid** (buttons), **Character** (position, crew role and all 13 vitals) and **Ship** (instruments, warning lights and the 17 functions, clickable).
 - Swagger UI: `http://127.0.0.1:8743/api/docs` — contract: `/api/v1/openapi.json`.
 - Every API call needs the token (`Authorization: Bearer …`), stored in `%APPDATA%\SC Telemetry Deck\settings.json`.
-- This preview listens on **this PC only** (`127.0.0.1`). Tablet / phone access (QR code), an editable grid and a single `.exe` come in the next steps.
+- This preview listens on **this PC only** (`127.0.0.1`). Tablet / phone access (QR code) and an editable grid come in the next steps.
 - Same safety rules as the plugin: dangerous actions are never sent, whatever the request.
 
 ## Plugin development
