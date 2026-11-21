@@ -1,6 +1,6 @@
 # Conception — « SC Telemetry Deck Web » (boutons dans un navigateur)
 
-Date : 2026-11-21 · Statut : à valider par Remi
+Date : 2026-11-21 · Statut : validée par Remi (réponses aux questions + ajout de l'API publique Swagger)
 
 ## Intention
 
@@ -34,6 +34,9 @@ lecteur), `src/actions/throttled-renderer.ts` (sans SDK). **Pas besoin de dépla
 5. **Exécutable unique** `sc-telemetry-web.exe` (aucune installation de Node pour le joueur), joint
    aux releases à côté du `.streamDeckPlugin`.
 6. Tout texte visible en **français et en anglais** (règle du projet).
+7. **API publique documentée en OpenAPI (Swagger)**, demandée par Remi : n'importe quel logiciel
+   (overlay de stream, bot, autre tableau de bord, script) peut lire l'état et déclencher des actions
+   à travers l'appli, avec les mêmes règles de sécurité que la page.
 
 ## Hors périmètre
 
@@ -94,14 +97,43 @@ Code — ils utilisent le titre de la touche) reçoivent un **rendu de tuile pro
 Morse affiche « ● TEXTE » pendant l'émission (lecteur unique, état visible sur tous les appareils). Mêmes limites que le plugin : rafraîchissement
 d'une tuile ≤ 4 / s, seulement si l'image change (`ThrottledRenderer`).
 
-### Protocole *(choix de Claude)*
+### API publique `v1` et Swagger
 
-- HTTP sans dépendance lourde : **Server-Sent Events** (`GET /api/events`) pour pousser les images et
-  les retours ✔ / ⚠, `POST /api/press` pour un appui, `GET/PUT /api/layout` pour la grille,
-  `GET /api/catalog` pour les listes (fonctions, données, actions, groupes) dans la langue demandée.
-- Chaque requête porte le jeton (`Authorization: Bearer …`, ou `?t=` pour l'URL du QR code, puis
-  conservé par la page). Jeton absent ou faux → `401`, rien d'autre.
-- La langue suit le navigateur (`fr…` → français, sinon anglais), avec un bouton FR / EN sur la page.
+La page web n'a **aucun accès privilégié** : elle utilise la même API publique que n'importe quel
+autre logiciel. L'API est donc conçue comme une interface stable, versionnée (`/api/v1/…`) et
+documentée.
+
+- **Contrat OpenAPI 3.1** écrit et maintenu dans le dépôt (`src/web/openapi.json`), servi à
+  `GET /api/v1/openapi.json`. Descriptions **bilingues** (anglais puis français), conformément à la
+  règle du projet.
+- **Swagger UI** à `GET /api/docs` (servi en local par l'appli, aucun appel à Internet) : on peut y
+  lire la documentation et essayer chaque requête avec son jeton.
+- **Test de contrat** : chaque route du serveur figure dans le contrat et inversement ; les réponses
+  des tests sont vérifiées contre les schémas du contrat. Une route non documentée fait échouer les tests.
+- Sécurité identique partout : schéma `bearerAuth` (jeton), mêmes refus (`DANGEROUS_ACTIONS`,
+  `decidePress`, réglages inconnus), mêmes restrictions « PC seulement » pour les réglages de sécurité.
+
+Ressources *(choix de Claude ; les noms exacts sont fixés dans le plan)* :
+
+| Ressource | Rôle |
+|---|---|
+| `GET /api/v1/status` | connexion au jeu, perso apparu, version du schéma et de l'appli |
+| `GET /api/v1/actions` | actions du jeu (vivantes ou instantané), sans les dangereuses, libellés FR / EN |
+| `POST /api/v1/actions/{name}/trigger` | déclencher une action par son nom (dangereuses refusées : `403`) |
+| `GET /api/v1/vitals` · `GET /api/v1/vitals/{id}` | constantes du perso (valeur, unité, niveau, « indisponible ») |
+| `GET /api/v1/ship/functions` · `GET /api/v1/ship/functions/{id}` | état des 17 fonctions vaisseau |
+| `POST /api/v1/ship/functions/{id}/press` | appui avec un mode (`toggle` / `on` / `off`), via `decidePress` |
+| `POST /api/v1/morse` · `DELETE /api/v1/morse` | lancer / arrêter une émission morse |
+| `GET /api/v1/telemetry/{section}` | dernière section brute du flux (`actor`, `vehicle`…), pour usages avancés |
+| `GET /api/v1/events` | flux temps réel (Server-Sent Events) : changements d'état, images des tuiles, ✔ / ⚠ |
+| `GET` · `PUT /api/v1/layout` | grille de la page |
+| `GET` · `PUT /api/v1/settings` | réglages ; les champs de sécurité ne sont modifiables que depuis le PC |
+| `POST /api/v1/token/rotate` | nouveau jeton (PC seulement) |
+
+- Jeton : en-tête `Authorization: Bearer …` (ou `?t=` pour l'URL du QR code, puis conservé par la
+  page). Absent ou faux → `401`, rien d'autre. Seuls `/api/docs` et `/api/v1/openapi.json` sont
+  lisibles sans jeton (documentation seulement, aucune donnée du jeu).
+- Langue : paramètre `lang=fr|en` ou en-tête `Accept-Language` ; la page a un bouton FR / EN.
 
 ### Réseau et sécurité *(choix de Claude)*
 
@@ -151,7 +183,8 @@ d'une tuile ≤ 4 / s, seulement si l'image change (`ThrottledRenderer`).
 ### Étapes de livraison
 
 Chaque étape est testable et publiable seule :
-1. **Serveur + page PC seulement** : grille par défaut figée, état en direct, appuis, jeton.
+1. **Serveur + API `v1` + Swagger + page PC seulement** : contrat OpenAPI et Swagger UI, grille par
+   défaut figée, état en direct, appuis, jeton.
 2. **Accès réseau local** : réglage, QR code, nouveau jeton.
 3. **Grille modifiable** : mode édition, enregistrement côté serveur.
 4. **Exécutable** et ajout aux releases.
@@ -165,9 +198,10 @@ Chaque étape a son propre plan ; ce document les couvre toutes.
 - Mise en page de la grille et du mode édition, dans l'esprit sobre du plugin (fond sombre, tuiles carrées).
 - Tests : logique serveur testée comme le reste (faux jeu gRPC, requêtes HTTP réelles sur un port libre).
 
-## Questions ouvertes (pour Remi)
+## Décisions de Remi (2026-11-21)
 
-- Garder le réseau local **désactivé par défaut** (proposé, plus sûr) ou l'activer d'office ?
-- Grille par défaut : la liste proposée te convient-elle ?
-- Morse dans la page : mêmes réglages que la touche (texte, durée, répétitions) — proposé.
-- Exe non signé (avertissement SmartScreen) : acceptable, ou faut-il prévoir une signature ?
+- Réseau local **désactivé par défaut**.
+- Grille par défaut proposée : **acceptée**.
+- Exe **non signé** (avertissement SmartScreen) : **accepté**.
+- **Ajout : API publique documentée en Swagger (OpenAPI)** pour réutilisation par d'autres logiciels.
+- Morse dans la page : mêmes réglages que la touche (texte, durée, répétitions).
