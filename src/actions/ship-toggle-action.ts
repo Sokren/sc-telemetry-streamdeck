@@ -9,6 +9,7 @@ import {
 } from "@elgato/streamdeck";
 import type { JsonValue } from "@elgato/utils";
 import type { Lang } from "../catalog/labels.js";
+import { failureLog } from "../game/messages.js";
 import type { GameApi } from "../game/types.js";
 import { SHIP_FUNCTIONS, shipFunction, type ShipFunctionId } from "../ship/functions.js";
 import { decidePress, type ShipMode } from "../ship/press.js";
@@ -100,7 +101,7 @@ export class ShipToggleAction extends SingletonAction<ShipToggleSettings> {
 			await ev.action.showOk();
 			return;
 		}
-		this.deps.log(`Échec de ${decision.action} : ${result.reason}${result.message ? ` — ${result.message}` : ""}`);
+		this.deps.log(failureLog(decision.action, result));
 		await ev.action.showAlert();
 	}
 

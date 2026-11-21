@@ -11,6 +11,7 @@ import { buildDropdown, type ActionGroup } from "../catalog/dropdown.js";
 import { labelFor, type Lang } from "../catalog/labels.js";
 import type { ActionSource } from "../catalog/source.js";
 import { DANGEROUS_ACTIONS } from "../game/dangerous.js";
+import { failureLog } from "../game/messages.js";
 import type { GameApi } from "../game/types.js";
 
 export const TRIGGER_TIMEOUT_MS = 2000;
@@ -65,7 +66,7 @@ export abstract class CategoryAction extends SingletonAction<ActionSettings> {
 			return;
 		}
 		if (result.reason === "UNAVAILABLE") this.deps.source.invalidate();
-		this.deps.log(`Échec de ${name} : ${result.reason}${result.message ? ` — ${result.message}` : ""}`);
+		this.deps.log(failureLog(name, result));
 		await ev.action.showAlert();
 	}
 

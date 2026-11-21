@@ -846,7 +846,8 @@
 					"version",
 					"telemetry",
 					"character",
-					"schema"
+					"schema",
+					"actions"
 				],
 				"properties": {
 					"app": {
@@ -871,6 +872,14 @@
 					"schema": {
 						"type": "string",
 						"description": "Game version of the embedded schema — FR : version du jeu du schéma embarqué"
+					},
+					"actions": {
+						"enum": [
+							"available",
+							"unsupported",
+							"unknown"
+						],
+						"description": "Whether the running game accepts actions: available (5.0+), unsupported (e.g. 4.10: telemetry only — display works, actions do not), unknown (game unreachable). Checked every 30 s. — FR : le jeu en cours accepte-t-il les actions : available (5.0+), unsupported (ex. 4.10 : télémétrie seule — l'affichage marche, pas les actions), unknown (jeu injoignable). Vérifié toutes les 30 s."
 					}
 				}
 			},

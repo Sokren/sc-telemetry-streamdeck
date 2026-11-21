@@ -138,6 +138,15 @@ describe("appui", () => {
 		expect(logs).toHaveLength(1);
 	});
 
+	test("jeu sans commandes d'actions (4.10) → ⚠ et journal explicite FR / EN", async () => {
+		result = { ok: false, reason: "UNIMPLEMENTED" };
+		const key = new FakeKey("k1");
+		await press(key, { function: "lights" });
+		expect(key.sent).toEqual(["alert"]);
+		expect(logs[0]).toContain("Star Citizen 5.0");
+		expect(logs[0]).toContain("5.0 required");
+	});
+
 	test("refus du jeu → ⚠ + journal", async () => {
 		result = { ok: false, reason: "TRIGGER_GAME_ACTION_STATUS_FILTERED" };
 		const key = new FakeKey("k1");

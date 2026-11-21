@@ -9,6 +9,7 @@ import type { TelemetryHub } from "../telemetry/hub.js";
 import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
 import { MorseControl } from "./morse-control.js";
+import { ActionCapability } from "./capability.js";
 import { EventHub } from "./events.js";
 import { DEFAULT_LAYOUT } from "./layout.js";
 import { actionRoutes } from "./routes/actions.js";
@@ -28,6 +29,8 @@ export type AppDeps = {
 	game: GameApi;
 	hub: TelemetryHub;
 	source: ActionSource;
+	/** Le jeu accepte-t-il les actions ? (par défaut : vérifié sur `game` toutes les 30 s). */
+	capability?: ActionCapability;
 	/** Émission morse (par défaut : créée sur `game`). */
 	morse?: MorseControl;
 	/** Dossier de `swagger-ui-dist` (par défaut : résolu depuis node_modules). */
@@ -94,6 +97,7 @@ export function createApp(deps: AppDeps): App {
 	// Le flux du jeu reste ouvert tant que l'appli tourne (état toujours à jour pour l'API).
 	const unsubscribe = deps.hub.subscribe(() => {});
 	const layout = () => DEFAULT_LAYOUT;
+	const capability = deps.capability ?? new ActionCapability(deps.game);
 	const status = () => {
 		const actor = deps.hub.section("actor");
 		const live = actor !== undefined || deps.hub.section("vehicle") !== undefined;
@@ -103,9 +107,13 @@ export function createApp(deps: AppDeps): App {
 			telemetry: live ? "live" : "no_data",
 			character: actor ? "spawned" : "unknown",
 			schema: deps.schemaVersion,
+			actions: capability.value,
 		};
 	};
 	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status });
+	// Changement de capacité (jeu relancé dans une autre version) → état renvoyé aux pages connectées.
+	const stopCapability = capability.onChange(() => events.refresh());
+	capability.start();
 
 	const routes: Route[] = [
 		{
@@ -151,6 +159,8 @@ export function createApp(deps: AppDeps): App {
 		routes,
 		handler: createHandler(routes, () => deps.settings.token, deps.fallback),
 		close: () => {
+			stopCapability();
+			capability.stop();
 			events.close();
 			unsubscribe();
 		},

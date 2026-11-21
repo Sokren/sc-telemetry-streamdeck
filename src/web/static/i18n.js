@@ -22,6 +22,7 @@ export const I18N = {
 		notInShip: "Pas dans un vaisseau (ou jeu fermé).",
 		landed: "posé",
 		flying: "en vol",
+		actionsUnsupported: "Cette version du jeu ne permet pas de déclencher des actions (Star Citizen 5.0 requis). L'affichage des informations fonctionne.",
 	},
 	en: {
 		title: "SC Telemetry Deck",
@@ -45,5 +46,6 @@ export const I18N = {
 		notInShip: "Not in a ship (or game closed).",
 		landed: "landed",
 		flying: "flying",
+		actionsUnsupported: "This game version cannot trigger actions (Star Citizen 5.0 required). Information display works.",
 	},
 };

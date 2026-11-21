@@ -22,6 +22,8 @@ export type FakeHandlers = {
 	holdOpen?: boolean;
 	/** Terminer le flux par une erreur gRPC au lieu d'une fin normale. */
 	streamError?: boolean;
+	/** Jeu 4.10 : seulement le flux de télémétrie, sans les commandes d'actions (arrivées en 5.0). */
+	legacy?: boolean;
 };
 
 function method(name: string, req: string, res: string, responseStream = false) {
@@ -40,24 +42,25 @@ function method(name: string, req: string, res: string, responseStream = false) 
 
 export async function startFakeGame(h: FakeHandlers): Promise<{ port: number; stop(): Promise<void> }> {
 	const server = new grpc.Server();
-	server.addService(
-		{
-			ListTriggerableActions: method("ListTriggerableActions", "ListTriggerableActionsRequest", "ListTriggerableActionsResponse"),
-			TriggerGameAction: method("TriggerGameAction", "TriggerGameActionRequest", "TriggerGameActionResponse"),
-			TelemetryStream: method("TelemetryStream", "TelemetryStreamRequest", "TelemetryStreamResponse", true),
+	const definition: Record<string, ReturnType<typeof method>> = {
+		TelemetryStream: method("TelemetryStream", "TelemetryStreamRequest", "TelemetryStreamResponse", true),
+	};
+	const implementation: grpc.UntypedServiceImplementation = {
+		TelemetryStream: (call: grpc.ServerWritableStream<object, object>) => {
+			for (const f of h.frames ?? []) call.write(f);
+			if (h.streamError) call.emit("error", { code: grpc.status.INTERNAL, details: "erreur simulée" });
+			else if (!h.holdOpen) call.end();
 		},
-		{
-			ListTriggerableActions: (_call: grpc.ServerUnaryCall<object, object>, cb: grpc.sendUnaryData<object>) =>
-				cb(null, { actions: h.actions ?? [] }),
-			TriggerGameAction: (call: grpc.ServerUnaryCall<TriggerRequest, object>, cb: grpc.sendUnaryData<object>) =>
-				cb(null, h.trigger?.(call.request) ?? { status: 1 }),
-			TelemetryStream: (call: grpc.ServerWritableStream<object, object>) => {
-				for (const f of h.frames ?? []) call.write(f);
-				if (h.streamError) call.emit("error", { code: grpc.status.INTERNAL, details: "erreur simulée" });
-				else if (!h.holdOpen) call.end();
-			},
-		},
-	);
+	};
+	if (!h.legacy) {
+		definition.ListTriggerableActions = method("ListTriggerableActions", "ListTriggerableActionsRequest", "ListTriggerableActionsResponse");
+		definition.TriggerGameAction = method("TriggerGameAction", "TriggerGameActionRequest", "TriggerGameActionResponse");
+		implementation.ListTriggerableActions = (_call: grpc.ServerUnaryCall<object, object>, cb: grpc.sendUnaryData<object>) =>
+			cb(null, { actions: h.actions ?? [] });
+		implementation.TriggerGameAction = (call: grpc.ServerUnaryCall<TriggerRequest, object>, cb: grpc.sendUnaryData<object>) =>
+			cb(null, h.trigger?.(call.request) ?? { status: 1 });
+	}
+	server.addService(definition as grpc.ServiceDefinition, implementation);
 	const port = await new Promise<number>((resolve, reject) =>
 		server.bindAsync("127.0.0.1:0", grpc.ServerCredentials.createInsecure(), (err, p) => (err ? reject(err) : resolve(p))),
 	);

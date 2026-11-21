@@ -55,6 +55,11 @@ export class EventHub {
 		for (const c of this.#clients) this.#write(c, "feedback", { index, ...feedback });
 	}
 
+	/** Renvoie aux pages ce qui a changé hors du flux du jeu (ex. capacité « actions »). */
+	refresh(): void {
+		if (this.#clients.size > 0) this.#schedule();
+	}
+
 	close(): void {
 		for (const c of [...this.#clients]) {
 			c.res.end();

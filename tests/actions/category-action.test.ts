@@ -92,6 +92,15 @@ describe("appui sur la touche", () => {
 		expect(key.calls).toEqual(["ok"]);
 	});
 
+	test("jeu sans commandes d'actions (4.10) → ⚠ et journal explicite FR / EN", async () => {
+		game.result = { ok: false, reason: "UNIMPLEMENTED" };
+		const key = new FakeKey({ action: "emote_wave" });
+		await action.onKeyDown(keyDown(key));
+		expect(key.calls).toEqual(["alert"]);
+		expect(logs[0]).toContain("Star Citizen 5.0");
+		expect(logs[0]).toContain("5.0 required");
+	});
+
 	test("refus du jeu → ⚠ et une ligne de journal avec action, raison et message", async () => {
 		game.result = { ok: false, reason: "TRIGGER_GAME_ACTION_STATUS_MAP_INACTIVE", message: "carte inactive" };
 		const key = new FakeKey({ action: "emote_wave" });

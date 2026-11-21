@@ -195,6 +195,9 @@ function connect() {
 	source.addEventListener("status", (e) => {
 		const s = JSON.parse(e.data);
 		setStatus(s.telemetry === "live" ? "live" : "", s.telemetry === "live" ? t("live") : t("noData"));
+		// Jeu sans commandes d'actions (ex. 4.10) : l'affichage marche, pas les boutons.
+		$("notice").textContent = t("actionsUnsupported");
+		$("notice").hidden = s.actions !== "unsupported";
 	});
 	source.addEventListener("tile", (e) => {
 		const { index, image } = JSON.parse(e.data);
