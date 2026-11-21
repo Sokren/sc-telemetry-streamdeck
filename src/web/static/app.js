@@ -246,6 +246,9 @@ function connect() {
 	source = new EventSource(`/api/v1/events?t=${encodeURIComponent(token)}&lang=${lang}`);
 	source.addEventListener("status", (e) => {
 		const s = JSON.parse(e.data);
+		// Version de l'appli (survol : version du jeu dont vient le schéma embarqué).
+		$("version").textContent = s.version ? `v${s.version}` : "";
+		$("version").title = s.schema ? `${t("gameSchema")} ${s.schema}` : "";
 		setStatus(s.telemetry === "live" ? "live" : "", s.telemetry === "live" ? t("live") : t("noData"));
 		if (s.telemetry === "live" && !emotesLoaded) loadEmotes();
 		// Jeu sans commandes d'actions (ex. 4.10) : l'affichage marche, pas les boutons.
