@@ -667,6 +667,54 @@
 					}
 				}
 			}
+		},
+		"/api/v1/events": {
+			"get": {
+				"operationId": "streamEvents",
+				"tags": [
+					"Realtime"
+				],
+				"summary": "Real-time events (SSE) — événements temps réel (SSE)",
+				"description": "Server-Sent Events stream. Events: status (same object as /status, when it changes), tile {index, image} (only tiles whose image changed), state {vitals, ship} (at most 4 per second, only when changed), feedback {index, feedback, detail?} after a tile press. A ': ping' comment every 15 s. Browsers' EventSource cannot send headers: pass the token as ?t=. — FR : flux Server-Sent Events. Événements : status (même objet que /status, quand il change), tile {index, image} (seulement les tuiles dont l'image change), state {vitals, ship} (au plus 4 par seconde, seulement si changé), feedback {index, feedback, detail?} après un appui de tuile. Un commentaire « : ping » toutes les 15 s. EventSource ne peut pas envoyer d'en-tête : passer le jeton en ?t=.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language — FR : langue des libellés"
+					},
+					{
+						"name": "t",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"description": "Token (for EventSource) — FR : jeton (pour EventSource)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Event stream — flux d'événements",
+						"content": {
+							"text/event-stream": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
 		}
 	},
 	"components": {

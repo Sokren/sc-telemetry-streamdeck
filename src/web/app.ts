@@ -9,6 +9,7 @@ import type { TelemetryHub } from "../telemetry/hub.js";
 import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
 import { MorseControl } from "./morse-control.js";
+import { EventHub } from "./events.js";
 import { DEFAULT_LAYOUT } from "./layout.js";
 import { actionRoutes } from "./routes/actions.js";
 import { layoutRoutes } from "./routes/layout.js";
@@ -77,24 +78,32 @@ export function createApp(deps: AppDeps): App {
 	const morse = deps.morse ?? new MorseControl(deps.game);
 	// Le flux du jeu reste ouvert tant que l'appli tourne (état toujours à jour pour l'API).
 	const unsubscribe = deps.hub.subscribe(() => {});
+	const layout = () => DEFAULT_LAYOUT;
+	const status = () => {
+		const actor = deps.hub.section("actor");
+		const live = actor !== undefined || deps.hub.section("vehicle") !== undefined;
+		return {
+			app: "sc-telemetry-web",
+			version: deps.version,
+			telemetry: live ? "live" : "no_data",
+			character: actor ? "spawned" : "unknown",
+			schema: deps.schemaVersion,
+		};
+	};
+	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status });
 
 	const routes: Route[] = [
 		{
 			method: "GET",
 			path: "/api/v1/status",
-			handle: async () => {
-				const actor = deps.hub.section("actor");
-				const live = actor !== undefined || deps.hub.section("vehicle") !== undefined;
-				return {
-					status: 200,
-					json: {
-						app: "sc-telemetry-web",
-						version: deps.version,
-						telemetry: live ? "live" : "no_data",
-						character: actor ? "spawned" : "unknown",
-						schema: deps.schemaVersion,
-					},
-				};
+			handle: async () => ({ status: 200, json: status() }),
+		},
+		{
+			method: "GET",
+			path: "/api/v1/events",
+			handle: async ({ req, res, lang }) => {
+				events.connect(req, res, lang);
+				return { stream: true };
 			},
 		},
 		...actionRoutes(deps),
@@ -102,7 +111,7 @@ export function createApp(deps: AppDeps): App {
 		...telemetryRoutes(deps),
 		...shipRoutes(deps),
 		...morseRoutes({ morse }),
-		...layoutRoutes({ hub: deps.hub, game: deps.game, morse, layout: () => DEFAULT_LAYOUT }),
+		...layoutRoutes({ hub: deps.hub, game: deps.game, morse, layout, onFeedback: (i, f) => events.feedback(i, f) }),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },
 		{
 			method: "GET",
@@ -125,6 +134,9 @@ export function createApp(deps: AppDeps): App {
 	return {
 		routes,
 		handler: createHandler(routes, () => deps.settings.token, deps.fallback),
-		close: unsubscribe,
+		close: () => {
+			events.close();
+			unsubscribe();
+		},
 	};
 }
