@@ -1,6 +1,7 @@
 // Page de SC Telemetry Deck : grille de tuiles, onglets Personnage et Vaisseau, état en direct
 // (Server-Sent Events), appuis. Utilise uniquement l'API publique v1 (la même que n'importe quel autre logiciel).
 import { I18N } from "./i18n.js";
+import { createLan } from "./lan.js";
 import { createView } from "./view.js";
 
 const TOKEN_KEY = "sctd-token";
@@ -76,6 +77,7 @@ function applyTexts() {
 	renderAbout();
 	$("emotes-hint").textContent = t("emotesHint");
 	myView?.applyTexts();
+	lanPanel?.applyTexts();
 }
 
 // ---------- À propos ----------
@@ -410,11 +412,21 @@ function connect() {
 		}
 		flashOn(tileButton(index), feedback === "ok" ? "ok" : "alert");
 	});
+	// Flux remplacé entre-temps (nouveau jeton, langue) : ses erreurs ne concernent plus la page.
+	const mine = source;
 	source.onerror = async () => {
+		if (mine !== source) return;
 		setStatus("off", t("offline"));
+		const used = token;
 		try {
-			const r = await fetch("/api/v1/status", { headers: { authorization: `Bearer ${token}` } });
-			if (r.status === 401) {
+			const r = await fetch("/api/v1/status", { headers: { authorization: `Bearer ${used}` } });
+			if (r.status === 401 && mine === source && used === token) {
+				// Nouveau jeton créé dans un autre onglet du PC : repris ici au lieu de « jeton refusé ».
+				const stored = storageGet(TOKEN_KEY);
+				if (stored && stored !== used) {
+					token = stored;
+					return connect();
+				}
 				source.close();
 				showMessage(t("badToken"));
 			}
@@ -456,6 +468,21 @@ const myView = createView({
 	storage: { get: storageGet, set: storageSet },
 });
 
+// ---------- Tablette / téléphone (PC seulement) ----------
+const lanPanel = createLan({
+	t,
+	token: () => token,
+	setToken(next) {
+		// Nouveau jeton : gardé, puis reconnexion (les flux ouverts avec l'ancien sont fermés par l'appli).
+		token = next;
+		storageSet(TOKEN_KEY, next);
+		showMessage("");
+		connect();
+	},
+	views: () => viewTabs ?? [],
+	currentView: () => viewId(currentTab),
+});
+
 applyTexts();
 // Onglet de départ : lien `?view=`, sinon dernier choix de l'appareil (ancien « myview » → première vue).
 const savedTab = storageGet(TAB_KEY);
@@ -465,4 +492,5 @@ if (!token) {
 	showMessage(t("needToken"));
 } else {
 	connect();
+	lanPanel.check();
 }

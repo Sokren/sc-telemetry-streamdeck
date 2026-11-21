@@ -18,6 +18,7 @@
         "@elgato/streamdeck": "^3.0.6",
         "@grpc/grpc-js": "^1.14.7",
         "protobufjs": "^8.8.1",
+        "qrcode-generator": "2.0.4",
         "swagger-ui-dist": "^5.35.1"
     },
     "devDependencies": {

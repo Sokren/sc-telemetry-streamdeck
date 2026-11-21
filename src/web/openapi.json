@@ -925,6 +925,215 @@
 				}
 			}
 		},
+		"/api/v1/lan": {
+			"get": {
+				"operationId": "getLan",
+				"tags": [
+					"LAN"
+				],
+				"summary": "Tablet / phone access — accès tablette / téléphone",
+				"description": "Local network access: whether it is on, the full link for a tablet or phone (with the token; the page masks it until asked), the network card used (by name, never by address) and the number of connected devices (never their addresses). If the chosen card’s address changed, the app listens again on the new one. — FR : accès par le réseau local : activé ou non, le lien complet pour une tablette ou un téléphone (avec le jeton ; la page le masque tant qu’on ne demande pas à le voir), la carte réseau utilisée (par son nom, jamais par son adresse) et le nombre d’appareils connectés (jamais leurs adresses). Si l’adresse de la carte a changé, l’appli écoute de nouveau sur la nouvelle. Only from the PC running the app (127.0.0.1 / ::1): any other device gets 403 pc_only. — FR : seulement depuis le PC où tourne l’appli (127.0.0.1 / ::1) : tout autre appareil reçoit 403 pc_only.",
+				"responses": {
+					"200": {
+						"description": "Access state — état de l’accès",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LanState"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"403": {
+						"description": "Not called from the PC itself — pas appelé depuis le PC lui-même (pc_only)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"operationId": "setLan",
+				"tags": [
+					"LAN"
+				],
+				"summary": "Turn tablet / phone access on or off — activer ou couper l’accès tablette / téléphone",
+				"description": "enabled: listen on the local network too (127.0.0.1 + the chosen card). all: advanced option, listen on ALL interfaces (0.0.0.0) — also VPNs, virtual machines and any network the PC joins, public Wi-Fi included. network: card to use when there are several. Saved in settings.json. 500 listen_failed if the port cannot be opened: access is turned off again. — FR : enabled : écouter aussi sur le réseau local (127.0.0.1 + la carte choisie). all : option avancée, écouter sur TOUTES les interfaces (0.0.0.0) — aussi les VPN, les machines virtuelles et tout réseau auquel le PC se connecte, Wi-Fi public compris. network : carte à utiliser quand il y en a plusieurs. Enregistré dans settings.json. 500 listen_failed si le port ne peut pas être ouvert : l’accès est de nouveau coupé. Only from the PC running the app (127.0.0.1 / ::1): any other device gets 403 pc_only. — FR : seulement depuis le PC où tourne l’appli (127.0.0.1 / ::1) : tout autre appareil reçoit 403 pc_only.",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LanChange"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "New state — nouvel état",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LanState"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid body — corps invalide (invalid_lan)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"403": {
+						"description": "Not called from the PC itself — pas appelé depuis le PC lui-même (pc_only)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Port could not be opened — port impossible à ouvrir (listen_failed)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/lan/token": {
+			"post": {
+				"operationId": "newToken",
+				"tags": [
+					"LAN"
+				],
+				"summary": "New access token — nouveau jeton d’accès",
+				"description": "Replaces the access token (saved in settings.json) and closes every open event stream: every device must scan the new link; the PC page keeps working with the returned token. — FR : remplace le jeton d’accès (enregistré dans settings.json) et ferme tous les flux d’événements ouverts : chaque appareil doit scanner le nouveau lien ; la page du PC continue avec le jeton renvoyé. Only from the PC running the app (127.0.0.1 / ::1): any other device gets 403 pc_only. — FR : seulement depuis le PC où tourne l’appli (127.0.0.1 / ::1) : tout autre appareil reçoit 403 pc_only.",
+				"responses": {
+					"200": {
+						"description": "New token — nouveau jeton",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"required": [
+										"token"
+									],
+									"additionalProperties": false,
+									"properties": {
+										"token": {
+											"type": "string",
+											"minLength": 32
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"403": {
+						"description": "Not called from the PC itself — pas appelé depuis le PC lui-même (pc_only)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/lan/qr": {
+			"get": {
+				"operationId": "getLanQr",
+				"tags": [
+					"LAN"
+				],
+				"summary": "QR code of the tablet link — QR code du lien tablette",
+				"description": "SVG QR code (error correction M) of the local network link, opening the given view (?view=<id>; an invalid id is ignored). 409 lan_disabled if access is off, 404 no_network if no local network card was found. — FR : QR code SVG (correction d’erreur M) du lien réseau local, qui ouvre la vue indiquée (?view=<id> ; un identifiant invalide est ignoré). 409 lan_disabled si l’accès est coupé, 404 no_network si aucune carte réseau locale n’a été trouvée. Only from the PC running the app (127.0.0.1 / ::1): any other device gets 403 pc_only. — FR : seulement depuis le PC où tourne l’appli (127.0.0.1 / ::1) : tout autre appareil reçoit 403 pc_only.",
+				"parameters": [
+					{
+						"name": "view",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"description": "View to open — FR : vue à ouvrir"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "QR code (SVG)",
+						"content": {
+							"image/svg+xml": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"403": {
+						"description": "Not called from the PC itself — pas appelé depuis le PC lui-même (pc_only)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "No local network — aucun réseau local (no_network)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "Access is off — accès coupé (lan_disabled)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/api/v1/events": {
 			"get": {
 				"operationId": "streamEvents",
@@ -1829,6 +2038,91 @@
 						"items": {
 							"$ref": "#/components/schemas/NamedView"
 						}
+					}
+				}
+			},
+			"LanState": {
+				"type": "object",
+				"required": [
+					"enabled",
+					"all",
+					"devices"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"enabled": {
+						"type": "boolean"
+					},
+					"all": {
+						"type": "boolean",
+						"description": "Listening on all interfaces (0.0.0.0) — FR : écoute sur toutes les interfaces (0.0.0.0)"
+					},
+					"url": {
+						"type": "string",
+						"description": "Full link with the token — FR : lien complet avec le jeton"
+					},
+					"network": {
+						"type": "string",
+						"description": "Card used (name) — FR : carte utilisée (nom)"
+					},
+					"networks": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": [
+								"id",
+								"name"
+							],
+							"additionalProperties": false,
+							"properties": {
+								"id": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								}
+							}
+						},
+						"description": "Cards to choose from, when several — FR : cartes au choix, s’il y en a plusieurs"
+					},
+					"error": {
+						"enum": [
+							"listen_failed"
+						]
+					},
+					"devices": {
+						"type": "object",
+						"required": [
+							"pc",
+							"others"
+						],
+						"additionalProperties": false,
+						"properties": {
+							"pc": {
+								"type": "boolean"
+							},
+							"others": {
+								"type": "integer",
+								"minimum": 0
+							}
+						}
+					}
+				}
+			},
+			"LanChange": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"enabled": {
+						"type": "boolean"
+					},
+					"all": {
+						"type": "boolean"
+					},
+					"network": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 256
 					}
 				}
 			}

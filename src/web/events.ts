@@ -23,7 +23,7 @@ export type EventHubDeps = {
 	intervalMs?: number;
 };
 
-type Client = { res: ServerResponse; lang: Lang; status?: string; tiles: string[]; state?: string; views?: string };
+type Client = { res: ServerResponse; remote: string; lang: Lang; status?: string; tiles: string[]; state?: string; views?: string };
 
 const PING_MS = 15_000;
 
@@ -45,11 +45,16 @@ export class EventHub {
 
 	connect(req: IncomingMessage, res: ServerResponse, lang: Lang): void {
 		res.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", connection: "keep-alive" });
-		const client: Client = { res, lang, tiles: [] };
+		const client: Client = { res, remote: req.socket?.remoteAddress ?? "", lang, tiles: [] };
 		this.#clients.add(client);
 		if (this.#clients.size === 1) this.#start();
 		req.on("close", () => this.#remove(client));
 		this.#send(client);
+	}
+
+	/** Adresses distantes des pages connectées (appareils, jamais affichées). */
+	remotes(): string[] {
+		return [...this.#clients].map((c) => c.remote);
 	}
 
 	/** Retour ✔ / ⚠ d'un appui de tuile, pour toutes les pages connectées. */

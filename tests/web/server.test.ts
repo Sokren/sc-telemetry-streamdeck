@@ -72,3 +72,27 @@ describe("textes de la page", () => {
 		for (const k of used) expect(Object.keys(I18N.fr), k).toContain(k);
 	});
 });
+
+describe("serveur — deux instances", () => {
+	test("port déjà pris (exe lancé deux fois, accès réseau activé) : erreur EADDRINUSE, réglages de l'autre intacts", async () => {
+		const first = await start();
+		const port = Number(new URL(first.url).port);
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sc-srv2-"));
+		try {
+			fs.writeFileSync(path.join(dir, "settings.json"), JSON.stringify({ port, lan: true, lanAll: true, token: "y".repeat(40) }));
+			const second = startServer({
+				settingsDir: dir,
+				dataDir: path.join(root, "schema"),
+				staticDir: path.join(root, "src/web/static"),
+				openapiFile: path.join(root, "src/web/openapi.json"),
+				gameAddress: "127.0.0.1:1",
+				openBrowser: false,
+				log: () => {},
+			});
+			await expect(second).rejects.toMatchObject({ code: "EADDRINUSE" });
+			expect(JSON.parse(fs.readFileSync(path.join(dir, "settings.json"), "utf-8"))).toMatchObject({ lan: true, lanAll: true });
+		} finally {
+			fs.rmSync(dir, { recursive: true, force: true });
+		}
+	}, 15_000);
+});

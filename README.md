@@ -133,7 +133,10 @@ npm run build:exe        # builds dist\sc-telemetry-web.exe (single file, Node S
 - Page: `http://127.0.0.1:8743/` — the app opens it with the access token included. Tabs: **Grid** (buttons), **Character** (position, crew role, all 13 vitals and the 34 emotes, clickable), **Ship** (instruments, warning lights and the 17 functions, clickable) and **your views** (first one: **My view**; **＋** adds more, up to 10): your own layouts, with named sections (half or full width) and the items you pick from an **Add** menu (vitals, instruments, warning lights, ship functions, actions, emotes), moved by drag and drop (mouse or touch). Unlock a view with the padlock to edit, rename or delete it, lock it to use it. Views are saved in the app (`view.json` next to `settings.json`) and kept when it restarts: one view per screen (PC, tablet, phone…), and a link ending in `?view=<id>` opens a given view directly (the device remembers it; the tabs, or a list on a phone, switch views).
 - Swagger UI: `http://127.0.0.1:8743/api/docs` — contract: `/api/v1/openapi.json`.
 - Every API call needs the token (`Authorization: Bearer …`), stored in `%APPDATA%\SC Telemetry Deck\settings.json`.
-- This preview listens on **this PC only** (`127.0.0.1`). Tablet / phone access (QR code) and an editable grid come in the next steps.
+- **Tablet / phone** (button in the header, on the PC only): turn on **Allow access from the local network**, then scan the **QR code** with the tablet's camera (same Wi-Fi as the PC). The QR code and the full address are **hidden** every time the window opens (no IP on screen, handy when streaming); **Copy link** works even while hidden. **Open on** picks the view the link opens. **New token** disconnects every other device. The first time, Windows may ask to allow the app through the firewall: tick **Private networks**.
+  - Off by default: the app then listens on **this PC only** (`127.0.0.1`). On: this PC plus the chosen network card (virtual cards — WSL, Hyper-V, VirtualBox, VPN… — are left out). Only the PC can change these settings or see the link.
+  - The connection is **not encrypted** and the link contains the token: use it at home, not on public Wi-Fi.
+  - Advanced option, **at your own risk**: **Listen on all interfaces (0.0.0.0)** exposes the app on every network card of the PC (VPNs, virtual machines, public Wi-Fi…): anyone there who gets the link can control the game.
 - Same safety rules as the plugin: dangerous actions are never sent, whatever the request.
 
 ## Plugin development
@@ -189,3 +192,5 @@ The scripts' messages and comments are in French.
 ## License
 
 To be decided.
+
+Third-party: the web app's QR codes are made with [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) by Kazuhiko Arase (MIT license). “QR Code” is a registered trademark of DENSO WAVE INCORPORATED.

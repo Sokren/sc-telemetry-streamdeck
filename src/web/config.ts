@@ -3,8 +3,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-/** Réglages de l'appli web, enregistrés dans `settings.json`. */
-export type WebSettings = { port: number; lan: boolean; token: string };
+/**
+ * Réglages de l'appli web, enregistrés dans `settings.json`.
+ * `lan` : accès depuis le réseau local ; `lanAll` : sur toutes les interfaces (0.0.0.0, option avancée) ;
+ * `lanNetwork` : carte réseau choisie quand il y en a plusieurs.
+ */
+export type WebSettings = { port: number; lan: boolean; lanAll?: boolean; lanNetwork?: string; token: string };
 
 export const DEFAULT_PORT = 8743;
 const MIN_TOKEN = 32;
@@ -14,7 +18,12 @@ export function defaultSettingsDir(): string {
 	return path.join(process.env.APPDATA ?? os.homedir(), "SC Telemetry Deck");
 }
 
-const newToken = () => crypto.randomBytes(24).toString("base64url");
+export const newToken = () => crypto.randomBytes(24).toString("base64url");
+
+/** Réécrit `settings.json`. */
+export function saveSettings(dir: string, settings: WebSettings): void {
+	fs.writeFileSync(path.join(dir, "settings.json"), `${JSON.stringify(settings, null, "\t")}\n`);
+}
 
 /**
  * Lit les réglages (dossier et fichier créés au besoin). Champ absent ou invalide → valeur par défaut ;
@@ -38,8 +47,10 @@ export function loadSettings(dir: string): WebSettings {
 	const settings: WebSettings = {
 		port,
 		lan: raw.lan === true,
+		...(typeof raw.lanAll === "boolean" ? { lanAll: raw.lanAll } : {}),
+		...(typeof raw.lanNetwork === "string" && raw.lanNetwork ? { lanNetwork: raw.lanNetwork } : {}),
 		token: typeof raw.token === "string" && raw.token.length >= MIN_TOKEN ? raw.token : newToken(),
 	};
-	fs.writeFileSync(file, `${JSON.stringify(settings, null, "\t")}\n`);
+	saveSettings(dir, settings);
 	return settings;
 }

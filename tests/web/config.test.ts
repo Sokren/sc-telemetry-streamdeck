@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { loadSettings } from "../../src/web/config.js";
+import { loadSettings, saveSettings } from "../../src/web/config.js";
 
 const dirs: string[] = [];
 const tmp = () => {
@@ -41,6 +41,20 @@ describe("réglages de l'appli web", () => {
 		expect(s.port).toBe(8743);
 		expect(s.lan).toBe(false);
 		expect(s.token.length).toBeGreaterThanOrEqual(32);
+	});
+
+	test("accès réseau : toutes les interfaces et carte choisie gardées ; saveSettings réécrit", () => {
+		const dir = tmp();
+		fs.writeFileSync(path.join(dir, "settings.json"), JSON.stringify({ port: 9000, lan: true, lanAll: true, lanNetwork: "Wi-Fi", token: "x".repeat(40) }));
+		const s = loadSettings(dir);
+		expect(s).toEqual({ port: 9000, lan: true, lanAll: true, lanNetwork: "Wi-Fi", token: "x".repeat(40) });
+		s.lanAll = false;
+		saveSettings(dir, s);
+		expect(loadSettings(dir).lanAll).toBe(false);
+		fs.writeFileSync(path.join(dir, "settings.json"), JSON.stringify({ lanAll: "oui", lanNetwork: 3 }));
+		const bad = loadSettings(dir);
+		expect(bad.lanAll).toBeUndefined();
+		expect(bad.lanNetwork).toBeUndefined();
 	});
 
 	test("fichier corrompu → réglages neufs, ancien conservé en .bak", () => {

@@ -2,6 +2,7 @@
 	"static/index.html",
 	"static/app.js",
 	"static/view.js",
+	"static/lan.js",
 	"static/i18n.js",
 	"static/style.css",
 	"openapi.json",

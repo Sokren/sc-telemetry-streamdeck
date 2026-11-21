@@ -8,11 +8,13 @@ import type { GameApi } from "../game/types.js";
 import type { TelemetryHub } from "../telemetry/hub.js";
 import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
+import { isLoopback, LanManager } from "./lan.js";
 import { MorseControl } from "./morse-control.js";
 import { ActionCapability } from "./capability.js";
 import { EventHub } from "./events.js";
 import { DEFAULT_LAYOUT } from "./layout.js";
 import { actionRoutes } from "./routes/actions.js";
+import { lanRoutes } from "./routes/lan.js";
 import { layoutRoutes } from "./routes/layout.js";
 import { morseRoutes } from "./routes/morse.js";
 import { panelRoutes } from "./routes/panels.js";
@@ -41,11 +43,17 @@ export type AppDeps = {
 	openapi?: unknown;
 	/** Fichier des vues « Ma vue » (`view.json`) ; absent → vues gardées en mémoire seulement. */
 	viewFile?: string;
+	/** Réécrit `settings.json` (par défaut : rien, réglages en mémoire). */
+	saveSettings?: () => void;
+	/** Accès réseau local (par défaut : sans effet, écoute gérée par le serveur réel). */
+	lanFactory?: (settings: WebSettings, save: () => void) => LanManager;
+	/** L'appel vient-il du PC ? (par défaut : adresse distante locale). */
+	isLocal?: (req: IncomingMessage) => boolean;
 	/** Fichiers statiques de la page (étape suivante). */
 	fallback?: (req: IncomingMessage, res: ServerResponse) => boolean;
 };
 
-export type App = { routes: Route[]; handler: ReturnType<typeof createHandler>; close(): void };
+export type App = { routes: Route[]; handler: ReturnType<typeof createHandler>; lan: LanManager; close(): void };
 
 const DOC_FILES: Record<string, string> = {
 	"swagger-ui.css": "text/css; charset=utf-8",
@@ -114,6 +122,8 @@ export function createApp(deps: AppDeps): App {
 			actions: capability.value,
 		};
 	};
+	const save = deps.saveSettings ?? (() => {});
+	const lan = deps.lanFactory?.(deps.settings, save) ?? new LanManager({ settings: deps.settings, save, listen: async () => true, cards: () => [] });
 	const views = new ViewStore(deps.viewFile);
 	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status, views: (lang) => ({ views: views.list(lang) }) });
 	// Vue enregistrée (depuis n'importe quel appareil) → renvoyée à toutes les pages connectées.
@@ -143,6 +153,12 @@ export function createApp(deps: AppDeps): App {
 		...panelRoutes(deps),
 		...morseRoutes({ morse }),
 		...viewsRoutes({ views }),
+		...lanRoutes({
+			lan,
+			isLocal: deps.isLocal ?? ((req) => isLoopback(req.socket.remoteAddress)),
+			remotes: () => events.remotes(),
+			onToken: () => events.close(),
+		}),
 		...layoutRoutes({ hub: deps.hub, game: deps.game, morse, layout, onFeedback: (i, f) => events.feedback(i, f) }),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },
 		{
@@ -165,10 +181,12 @@ export function createApp(deps: AppDeps): App {
 
 	return {
 		routes,
+		lan,
 		handler: createHandler(routes, () => deps.settings.token, deps.fallback),
 		close: () => {
 			stopCapability();
 			stopView();
+			lan.stop();
 			capability.stop();
 			events.close();
 			unsubscribe();

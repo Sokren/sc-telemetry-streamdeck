@@ -133,7 +133,10 @@ npm run build:exe        # fabrique dist\sc-telemetry-web.exe (un seul fichier, 
 - Page : `http://127.0.0.1:8743/` — l'appli l'ouvre avec le jeton d'accès inclus. Onglets : **Grille** (boutons), **Personnage** (position, rôle, les 13 constantes et les 34 émotes, cliquables), **Vaisseau** (instruments, voyants et les 17 fonctions, cliquables) et **tes vues** (la première : **Ma vue** ; **＋** en ajoute, jusqu'à 10) : tes propres dispositions, avec des sections nommées (demi ou pleine largeur) et les cases que tu choisis dans un menu **Ajouter** (constantes, instruments, voyants, fonctions du vaisseau, actions, émotes), déplacées par glisser-déposer (souris ou doigt). Déverrouille une vue avec le cadenas pour la modifier, la renommer ou la supprimer, verrouille-la pour l'utiliser. Les vues sont enregistrées dans l'appli (`view.json` à côté de `settings.json`) et gardées quand elle redémarre : une vue par écran (PC, tablette, téléphone…), et un lien finissant par `?view=<id>` ouvre directement une vue (l'appareil s'en souvient ; les onglets, ou une liste sur téléphone, changent de vue).
 - Swagger UI : `http://127.0.0.1:8743/api/docs` — contrat : `/api/v1/openapi.json`.
 - Chaque appel à l'API demande le jeton (`Authorization: Bearer …`), enregistré dans `%APPDATA%\SC Telemetry Deck\settings.json`.
-- Cet aperçu n'écoute que **sur ce PC** (`127.0.0.1`). L'accès tablette / téléphone (QR code) et la grille modifiable arrivent aux étapes suivantes.
+- **Tablette / téléphone** (bouton dans l'en-tête, sur le PC seulement) : active **Autoriser l'accès depuis le réseau local**, puis scanne le **QR code** avec l'appareil photo de la tablette (même Wi-Fi que le PC). Le QR code et l'adresse complète sont **masqués** à chaque ouverture de la fenêtre (aucune IP à l'écran, pratique si tu streames) ; **Copier le lien** marche même masqué. **Ouvrir sur** choisit la vue que le lien ouvre. **Nouveau jeton** déconnecte tous les autres appareils. La première fois, Windows peut demander d'autoriser l'appli dans le pare-feu : coche **Réseaux privés**.
+  - Désactivé par défaut : l'appli n'écoute alors que **sur ce PC** (`127.0.0.1`). Activé : ce PC plus la carte réseau choisie (les cartes virtuelles — WSL, Hyper-V, VirtualBox, VPN… — sont écartées). Seul le PC peut changer ces réglages ou voir le lien.
+  - La connexion **n'est pas chiffrée** et le lien contient le jeton : à utiliser chez toi, pas sur un Wi-Fi public.
+  - Option avancée, **à tes risques** : **Écouter sur toutes les interfaces (0.0.0.0)** expose l'appli sur toutes les cartes réseau du PC (VPN, machines virtuelles, Wi-Fi public…) : n'importe qui là-dessus qui obtient le lien peut piloter le jeu.
 - Mêmes règles de sécurité que le plugin : les actions dangereuses ne sont jamais envoyées, quelle que soit la requête.
 
 ## Développement du plugin
@@ -187,3 +190,5 @@ Scripts Python autonomes (`pip install grpcio protobuf`) :
 ## Licence
 
 À définir.
+
+Tiers : les QR codes de l'appli web sont faits avec [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) de Kazuhiko Arase (licence MIT). « QR Code » est une marque déposée de DENSO WAVE INCORPORATED.
