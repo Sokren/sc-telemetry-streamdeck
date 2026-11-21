@@ -18,13 +18,16 @@ Plugin Stream Deck **et appli web autonome** pour **Star Citizen**, basés sur l
 > ⚠️ Projet communautaire non officiel, sans lien avec Cloud Imperium Games ni Elgato.
 > L'API n'est pas documentée par CIG et peut changer à chaque patch.
 
-> 🚧 En cours de développement.
+> [!WARNING]
+> **Bêta** — testé en jeu, mais l'API de télémétrie est récente, non documentée par CIG et peut changer à chaque patch.
+> Ce qui fonctionne dépend de ta version du jeu : **4.10.3 (LIVE) = affichage seulement**, **5.0 (PTU) = affichage + actions**.
+> Voir [Limites connues](#limites-connues). Problèmes ou idées : [Issues](../../issues).
 
 ---
 
 ## Installation
 
-1. **Active la télémétrie dans Star Citizen** — [voir les étapes ci-dessous](#activer-la-télémétrie-dans-star-citizen) (une ligne dans `user.cfg`).
+1. **Active la télémétrie dans Star Citizen** — [voir les étapes ci-dessous](#activer-la-télémétrie-dans-star-citizen) (une commande en 4.10.3 LIVE, une ligne dans `user.cfg` en 5.0 PTU).
 2. Télécharge les fichiers de la dernière [release](../../releases/latest) :
    - **Plugin Stream Deck** : `com.sokren.sc-telemetry.streamDeckPlugin` — double-clique dessus, le logiciel Stream Deck l'installe. Les actions apparaissent dans la catégorie **Star Citizen**.
    - **Appli web** (sans Stream Deck) : `sc-telemetry-web.exe` — un seul fichier, rien à installer. Double-clique dessus : la page s'ouvre dans ton navigateur. Windows peut afficher un avertissement SmartScreen la première fois (le fichier n'est pas signé) : *Informations complémentaires → Exécuter quand même*. Après un patch du jeu, tu peux poser un `sc_extrait.desc` / `actions.json` à jour à côté de l'exe.
@@ -33,19 +36,40 @@ Plugin Stream Deck **et appli web autonome** pour **Star Citizen**, basés sur l
 
 | | Version minimale |
 |---|---|
-| Star Citizen | **5.0 (PTU)** — le flux de télémétrie existe depuis 4.10.2, mais le déclenchement d'actions (`TriggerGameAction`) n'apparaît qu'en 5.0 |
+| Star Citizen | **4.10.3 (LIVE)** : affichage des informations seulement · **5.0 (PTU)** : tout (affichage + actions — `TriggerGameAction` n'apparaît qu'en 5.0) |
 | Stream Deck (logiciel) | 7.1 |
 | Node.js (développement uniquement) | 24 |
 
 ## Activer la télémétrie dans Star Citizen
 
-Le serveur de télémétrie local est **désactivé par défaut**. Une seule ligne suffit pour l'activer :
+Le serveur de télémétrie local est **désactivé par défaut**. La façon de l'activer dépend de la version du jeu.
+
+### Star Citizen 4.10.3 (LIVE) — variable d'environnement
+
+1. Ferme complètement le jeu **et le RSI Launcher** (y compris son icône à côté de l'horloge).
+
+2. Ouvre **PowerShell** (menu Démarrer → tape `PowerShell`) et lance :
+   ```powershell
+   setx GRPC_CLIENT_SERVER_ENABLED true
+   ```
+   Il répond `Opération réussie : la valeur spécifiée a été enregistrée.` La variable est enregistrée pour ton compte Windows : une seule fois suffit.
+
+3. Lance le **RSI Launcher**, puis le jeu. Le launcher doit être lancé *après* la commande : c'est lui qui transmet la variable au jeu.
+
+4. Fais apparaître ton perso : les touches et la page web affichent tes constantes et l'état de ton vaisseau. En 4.10.3, les actions (émotes, commandes du vaisseau…) ne peuvent pas être déclenchées — voir [Limites connues](#limites-connues).
+
+Pour la désactiver (PowerShell, puis relance le launcher) :
+```powershell
+[Environment]::SetEnvironmentVariable("GRPC_CLIENT_SERVER_ENABLED", $null, "User")
+```
+
+### Star Citizen 5.0 (PTU) — `user.cfg`
 
 1. Ferme le jeu, puis va dans le dossier du canal de jeu sur lequel tu joues, par exemple :
    ```
    C:\Program Files\Roberts Space Industries\StarCitizen\PTU\
    ```
-   (`LIVE\` pour le serveur live, quand la fonctionnalité y sera disponible. Ton dossier d'installation peut être différent.)
+   (Ton dossier d'installation peut être différent.)
 
 2. Ouvre le fichier `user.cfg` qui s'y trouve. S'il n'existe pas, crée-le : dans le Bloc-notes, *Fichier → Enregistrer sous*, nom `user.cfg`, type **Tous les fichiers** (pas `user.cfg.txt`).
 
@@ -62,9 +86,6 @@ Le serveur de télémétrie local est **désactivé par défaut**. Une seule lig
    ```
 
 5. Le flux ne démarre qu'une fois le personnage **apparu** (ligne `Initializing game telemetry component of local player`). D'ici là, les touches et la page web affichent « — ».
-
-> Alternative non vérifiée ici : la variable d'environnement `GRPC_CLIENT_SERVER_ENABLED=true`
-> (à définir avant de lancer le RSI Launcher, qui la transmet au jeu).
 
 Le serveur écoute uniquement sur `127.0.0.1`, sans TLS ni authentification : il n'est pas accessible depuis le réseau.
 
@@ -155,6 +176,8 @@ Scripts Python autonomes (`pip install grpcio protobuf`) :
 
 ## Limites connues
 
+- **Version du jeu** : en **4.10.3 (LIVE)**, seul l'affichage des informations fonctionne (constantes, état du vaisseau, onglets Personnage et Vaisseau). Le déclenchement d'actions — émotes, commandes du vaisseau, appuis Ship Toggle, morse — demande la **5.0** (PTU pour l'instant) : en 4.10.3, les touches affichent ⚠ et la page web affiche un bandeau.
+- **Windows uniquement** (plugin Stream Deck et appli web).
 - L'état de la **torche** n'est pas exposé (action `toggle_flashlight` uniquement).
 - En 5.0 PTU, le jeu accepte l'action `mobiglas` mais n'ouvre pas le mobiGlas.
 - Les événements mort / respawn existent dans le schéma mais ne sont pas émis : se baser sur la santé.

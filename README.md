@@ -18,13 +18,16 @@ Stream Deck plugin **and standalone web app** for **Star Citizen**, built on the
 > ⚠️ Unofficial community project, not affiliated with Cloud Imperium Games or Elgato.
 > The API is not documented by CIG and may change with any patch.
 
-> 🚧 Work in progress.
+> [!WARNING]
+> **Beta** — tested in game, but the telemetry API is new, undocumented by CIG and may change with any patch.
+> What works depends on your game version: **4.10.3 (LIVE) = display only**, **5.0 (PTU) = display + actions**.
+> See [Known limitations](#known-limitations). Problems or ideas: [Issues](../../issues).
 
 ---
 
 ## Installation
 
-1. **Enable telemetry in Star Citizen** — [see the steps below](#enabling-telemetry-in-star-citizen) (one line in `user.cfg`).
+1. **Enable telemetry in Star Citizen** — [see the steps below](#enabling-telemetry-in-star-citizen) (one command on 4.10.3 LIVE, one line in `user.cfg` on 5.0 PTU).
 2. Download the files from the latest [release](../../releases/latest):
    - **Stream Deck plugin**: `com.sokren.sc-telemetry.streamDeckPlugin` — double-click it, the Stream Deck app installs it. The actions appear under the **Star Citizen** category.
    - **Web app** (no Stream Deck needed): `sc-telemetry-web.exe` — a single file, nothing to install. Double-click it: the page opens in your browser. Windows may show a SmartScreen warning the first time (the file isn't signed): *More info → Run anyway*. After a game patch, you can drop an updated `sc_extrait.desc` / `actions.json` next to the exe.
@@ -33,19 +36,40 @@ Stream Deck plugin **and standalone web app** for **Star Citizen**, built on the
 
 | | Minimum version |
 |---|---|
-| Star Citizen | **5.0 (PTU)** — the telemetry stream exists since 4.10.2, but triggering actions (`TriggerGameAction`) only appears in 5.0 |
+| Star Citizen | **4.10.3 (LIVE)**: information display only · **5.0 (PTU)**: everything (display + actions — `TriggerGameAction` only appears in 5.0) |
 | Stream Deck (app) | 7.1 |
 | Node.js (development only) | 24 |
 
 ## Enabling telemetry in Star Citizen
 
-The local telemetry server is **disabled by default**. Turning it on takes one line:
+The local telemetry server is **disabled by default**. How to turn it on depends on the game version.
+
+### Star Citizen 4.10.3 (LIVE) — environment variable
+
+1. Close the game **and the RSI Launcher** completely (also its icon next to the clock).
+
+2. Open **PowerShell** (Start menu → type `PowerShell`) and run:
+   ```powershell
+   setx GRPC_CLIENT_SERVER_ENABLED true
+   ```
+   It answers `SUCCESS: Specified value was saved.` The variable is saved for your Windows account: doing it once is enough.
+
+3. Start the **RSI Launcher**, then the game. The launcher must be started *after* the command: it passes the variable on to the game.
+
+4. Spawn your character: the keys and the web page show your vitals and your ship's state. On 4.10.3, actions (emotes, ship commands…) can't be triggered — see [Known limitations](#known-limitations).
+
+To turn it off again (PowerShell, then restart the launcher):
+```powershell
+[Environment]::SetEnvironmentVariable("GRPC_CLIENT_SERVER_ENABLED", $null, "User")
+```
+
+### Star Citizen 5.0 (PTU) — `user.cfg`
 
 1. Close the game, then go to the folder of the game channel you play, for example:
    ```
    C:\Program Files\Roberts Space Industries\StarCitizen\PTU\
    ```
-   (`LIVE\` for the live server, once the feature is available there. Your install folder may differ.)
+   (Your install folder may differ.)
 
 2. Open the `user.cfg` file there. If it doesn't exist, create it: in Notepad, *File → Save as*, file name `user.cfg`, type **All files** (not `user.cfg.txt`).
 
@@ -62,9 +86,6 @@ The local telemetry server is **disabled by default**. Turning it on takes one l
    ```
 
 5. The stream only starts once your character has **spawned** (line `Initializing game telemetry component of local player`). Until then, keys and the web page show "—".
-
-> Not verified here: the environment variable `GRPC_CLIENT_SERVER_ENABLED=true`
-> (set before starting the RSI Launcher, which passes it on to the game).
 
 The server only listens on `127.0.0.1`, without TLS or authentication: it is not reachable from the network.
 
@@ -157,6 +178,8 @@ The scripts' messages and comments are in French.
 
 ## Known limitations
 
+- **Game version**: on **4.10.3 (LIVE)**, only information display works (vitals, ship state, Character and Ship tabs). Triggering actions — emotes, ship commands, Ship Toggle presses, Morse — needs **5.0** (PTU for now): on 4.10.3 keys show ⚠ and the web page shows a banner.
+- **Windows only** (Stream Deck plugin and web app).
 - The **flashlight** state is not exposed (only the `toggle_flashlight` action).
 - In 5.0 PTU, the game accepts the `mobiglas` action but does not open the mobiGlas.
 - Death / respawn events exist in the schema but are not emitted: rely on health instead.
