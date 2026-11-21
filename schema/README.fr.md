@@ -4,7 +4,7 @@
 
 CIG ne publie pas le `.proto`. Il est reconstruit à partir des descripteurs protobuf embarqués dans `StarCitizen.exe`.
 
-**Version actuelle : Star Citizen 5.0.202.205 PTU (build 13238477)**, extraite le 2026-11-20.
+**Version actuelle : Star Citizen 5.0.202.10025 PTU (build 13248297)**, vérifiée le 2026-11-21 (schéma, 112 actions et 948 noms de commandes identiques au build 13238477, extrait le 2026-11-20).
 
 ## Fichiers
 
@@ -50,4 +50,4 @@ python ..\tools\sc_actions_diff.py live --update --version "5.0 PTU build XXXXX"
 Les nouvelles actions apparaissent seules dans le plugin (la liste vient du jeu) ; ajouter leurs libellés FR / EN dans `src/catalog/labels.*.json`.
 
 La version du jeu est dans `Game.log` (`FileVersion:` et `Build(…)`).
-Vérifier les différences avec `git diff`, et nommer le commit avec la version du jeu, par ex. `schema: 5.0 PTU build 13238477`.
+Vérifier les différences avec `git diff`, et nommer le commit avec la version du jeu, par ex. `schema: 5.0 PTU build 13248297`.
