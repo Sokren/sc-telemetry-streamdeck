@@ -13,6 +13,7 @@ CIG does not publish the `.proto`. It is rebuilt from the protobuf descriptors e
 | `sc_extrait.desc` | **Reference.** Binary `FileDescriptorSet` (`types.proto` + `api.proto`): loaded by the plugin, the `tools/` scripts and `grpcurl -protoset` |
 | `sc_extrait.proto` | Readable version, for reference (both files concatenated: not compilable as is by `protoc`) |
 | `actions.json` | Snapshot of `ListTriggerableActions` (112 actions): documentation and fallback list when the game is closed; the plugin always asks the game first |
+| `command_names.json` | Command name table read from `StarCitizen.exe` (948 names, triggerable or not): reference to spot commands added by a patch |
 
 - Package: `sc.game.telemetry.v1`
 - Service: `GameTelemetryService` (`TelemetryStream`, `ListTriggerableActions`, `TriggerGameAction`)
@@ -31,11 +32,22 @@ python ..\tools\sc_extract_proto.py $exe --compare ancien.desc
 Remove-Item ancien.desc
 ```
 
+Spot new commands (no game needed), then save the new reference:
+
+```powershell
+python ..\tools\sc_actions_diff.py exe $exe --compare command_names.json
+python ..\tools\sc_actions_diff.py exe $exe --save command_names.json --version "5.0 PTU build XXXXX"
+```
+
 Then, with the game running and your character spawned:
 
 ```powershell
 python ..\tools\sc_champs_inconnus.py   # should print nothing if the schema is complete
+python ..\tools\sc_actions_diff.py live  # triggerable actions added / removed
+python ..\tools\sc_actions_diff.py live --update --version "5.0 PTU build XXXXX"   # refresh actions.json
 ```
+
+New actions show up in the plugin automatically (the list comes from the game); add their FR / EN labels in `src/catalog/labels.*.json`.
 
 The game version is in `Game.log` (`FileVersion:` and `Build(…)`).
 Check the differences with `git diff`, and name the commit after the game version, e.g. `schema: 5.0 PTU build 13238477`.
