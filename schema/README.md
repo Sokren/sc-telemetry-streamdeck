@@ -1,6 +1,6 @@
 # API schema
 
-🇬🇧 **English** · 🇫🇷 [Français](README.fr.md)
+**EN** English · 🇫🇷 [Français](README.fr.md)
 
 CIG does not publish the `.proto`. It is rebuilt from the protobuf descriptors embedded in `StarCitizen.exe`.
 

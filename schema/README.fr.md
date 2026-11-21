@@ -1,6 +1,6 @@
 # Schéma de l'API
 
-🇬🇧 [English](README.md) · 🇫🇷 **Français**
+**EN** [English](README.md) · 🇫🇷 **Français**
 
 CIG ne publie pas le `.proto`. Il est reconstruit à partir des descripteurs protobuf embarqués dans `StarCitizen.exe`.
 

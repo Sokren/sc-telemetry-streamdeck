@@ -1,12 +1,19 @@
 # SC Telemetry Deck
 
-🇬🇧 [English](README.md) · 🇫🇷 **Français**
+**EN** [English](README.md) · 🇫🇷 **Français**
 
-Plugin Stream Deck pour **Star Citizen**, basé sur l'API de télémétrie locale du jeu (gRPC, `127.0.0.1:2942`).
+Plugin Stream Deck **et appli web autonome** pour **Star Citizen**, basés sur l'API de télémétrie locale du jeu (gRPC, `127.0.0.1:2942`).
 
 - Déclencher les actions exposées par le jeu (émotes, torche, phares, train, portes, master mode…) et voir l'état réel du vaisseau sur la touche
 - Afficher les constantes du personnage sur les touches et les molettes du Stream Deck + (oxygène, santé, températures…)
+- Pas de Stream Deck ? Les mêmes boutons dans ton navigateur, avec les onglets Personnage et Vaisseau et une API documentée
 - Aucune modification du jeu, aucune lecture mémoire : uniquement l'API locale fournie par le client
+
+## 🎬 Démo
+
+[![SC Telemetry Deck — vidéo de démo (Stream Deck et appli web en jeu)](https://img.youtube.com/vi/t30sASa_oD4/hqdefault.jpg)](https://youtu.be/t30sASa_oD4)
+
+▶️ [Voir sur YouTube](https://youtu.be/t30sASa_oD4)
 
 > ⚠️ Projet communautaire non officiel, sans lien avec Cloud Imperium Games ni Elgato.
 > L'API n'est pas documentée par CIG et peut changer à chaque patch.
@@ -17,9 +24,10 @@ Plugin Stream Deck pour **Star Citizen**, basé sur l'API de télémétrie local
 
 ## Installation
 
-1. Active la télémétrie dans Star Citizen (voir ci-dessous).
-2. Télécharge `com.sokren.sc-telemetry.streamDeckPlugin` depuis la dernière [release](../../releases/latest).
-3. Double-clique dessus : le logiciel Stream Deck l'installe. Les actions apparaissent dans la catégorie **Star Citizen**.
+1. **Active la télémétrie dans Star Citizen** — [voir les étapes ci-dessous](#activer-la-télémétrie-dans-star-citizen) (une ligne dans `user.cfg`).
+2. Télécharge les fichiers de la dernière [release](../../releases/latest) :
+   - **Plugin Stream Deck** : `com.sokren.sc-telemetry.streamDeckPlugin` — double-clique dessus, le logiciel Stream Deck l'installe. Les actions apparaissent dans la catégorie **Star Citizen**.
+   - **Appli web** (sans Stream Deck) : `sc-telemetry-web-X.Y.Z.zip` — décompresse-le, puis lance `node server.mjs` dans ce dossier ([Node.js 24](https://nodejs.org) nécessaire pour l'instant). La page s'ouvre dans ton navigateur.
 
 ## Prérequis
 
@@ -31,27 +39,29 @@ Plugin Stream Deck pour **Star Citizen**, basé sur l'API de télémétrie local
 
 ## Activer la télémétrie dans Star Citizen
 
-Le serveur de télémétrie local est **désactivé par défaut**.
+Le serveur de télémétrie local est **désactivé par défaut**. Une seule ligne suffit pour l'activer :
 
-1. Ouvre (ou crée) le fichier `user.cfg` à la racine du canal de jeu :
+1. Ferme le jeu, puis va dans le dossier du canal de jeu sur lequel tu joues, par exemple :
    ```
-   …\Roberts Space Industries\StarCitizen\PTU\user.cfg
+   C:\Program Files\Roberts Space Industries\StarCitizen\PTU\
    ```
-   (`LIVE\user.cfg` pour le serveur live, quand la fonctionnalité y sera disponible)
+   (`LIVE\` pour le serveur live, quand la fonctionnalité y sera disponible. Ton dossier d'installation peut être différent.)
 
-2. Ajoute la ligne :
+2. Ouvre le fichier `user.cfg` qui s'y trouve. S'il n'existe pas, crée-le : dans le Bloc-notes, *Fichier → Enregistrer sous*, nom `user.cfg`, type **Tous les fichiers** (pas `user.cfg.txt`).
+
+3. Ajoute cette ligne et enregistre :
    ```ini
    server.game.telemetry.enabled=1
    ```
 
-3. Lance le jeu. Dans `Game.log` (même dossier), tu dois trouver :
+4. Lance le jeu. Dans `Game.log` (même dossier), tu dois trouver :
    ```
    [User CFG ] server.game.telemetry.enabled=true
    <Register Service> Service 'sc.game.telemetry.v1.GameTelemetryService' registered
    <GameTelemetry> Local services server is running on 127.0.0.1:2942
    ```
 
-4. Le flux ne démarre qu'une fois le personnage **spawné** (ligne `Initializing game telemetry component of local player`).
+5. Le flux ne démarre qu'une fois le personnage **apparu** (ligne `Initializing game telemetry component of local player`). D'ici là, les touches et la page web affichent « — ».
 
 > Alternative non vérifiée ici : la variable d'environnement `GRPC_CLIENT_SERVER_ENABLED=true`
 > (à définir avant de lancer le RSI Launcher, qui la transmet au jeu).

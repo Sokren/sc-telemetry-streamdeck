@@ -1,12 +1,19 @@
 # SC Telemetry Deck
 
-🇬🇧 **English** · 🇫🇷 [Français](README.fr.md)
+**EN** English · 🇫🇷 [Français](README.fr.md)
 
-Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
+Stream Deck plugin **and standalone web app** for **Star Citizen**, built on the game's local telemetry API (gRPC, `127.0.0.1:2942`).
 
 - Trigger the actions the game exposes (emotes, flashlight, lights, landing gear, doors, master mode…) and see the ship's real state on the key
 - Show your character's vitals on your keys and Stream Deck + dials (oxygen, health, temperatures…)
+- No Stream Deck? Use the same buttons in your browser, with Character and Ship tabs and a documented API
 - No game modification, no memory reading: only the local API provided by the game client
+
+## 🎬 Demo
+
+[![SC Telemetry Deck — demo video (Stream Deck and web app in game)](https://img.youtube.com/vi/t30sASa_oD4/hqdefault.jpg)](https://youtu.be/t30sASa_oD4)
+
+▶️ [Watch on YouTube](https://youtu.be/t30sASa_oD4)
 
 > ⚠️ Unofficial community project, not affiliated with Cloud Imperium Games or Elgato.
 > The API is not documented by CIG and may change with any patch.
@@ -17,9 +24,10 @@ Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API
 
 ## Installation
 
-1. Enable telemetry in Star Citizen (see below).
-2. Download `com.sokren.sc-telemetry.streamDeckPlugin` from the latest [release](../../releases/latest).
-3. Double-click it: the Stream Deck app installs it. The actions appear under the **Star Citizen** category.
+1. **Enable telemetry in Star Citizen** — [see the steps below](#enabling-telemetry-in-star-citizen) (one line in `user.cfg`).
+2. Download the files from the latest [release](../../releases/latest):
+   - **Stream Deck plugin**: `com.sokren.sc-telemetry.streamDeckPlugin` — double-click it, the Stream Deck app installs it. The actions appear under the **Star Citizen** category.
+   - **Web app** (no Stream Deck needed): `sc-telemetry-web-X.Y.Z.zip` — unzip it, then run `node server.mjs` in that folder ([Node.js 24](https://nodejs.org) required for now). The page opens in your browser.
 
 ## Requirements
 
@@ -31,27 +39,29 @@ Stream Deck plugin for **Star Citizen**, built on the game's local telemetry API
 
 ## Enabling telemetry in Star Citizen
 
-The local telemetry server is **disabled by default**.
+The local telemetry server is **disabled by default**. Turning it on takes one line:
 
-1. Open (or create) the `user.cfg` file at the root of the game channel:
+1. Close the game, then go to the folder of the game channel you play, for example:
    ```
-   …\Roberts Space Industries\StarCitizen\PTU\user.cfg
+   C:\Program Files\Roberts Space Industries\StarCitizen\PTU\
    ```
-   (`LIVE\user.cfg` for the live server, once the feature is available there)
+   (`LIVE\` for the live server, once the feature is available there. Your install folder may differ.)
 
-2. Add the line:
+2. Open the `user.cfg` file there. If it doesn't exist, create it: in Notepad, *File → Save as*, file name `user.cfg`, type **All files** (not `user.cfg.txt`).
+
+3. Add this line and save:
    ```ini
    server.game.telemetry.enabled=1
    ```
 
-3. Start the game. In `Game.log` (same folder) you should find:
+4. Start the game. In `Game.log` (same folder) you should find:
    ```
    [User CFG ] server.game.telemetry.enabled=true
    <Register Service> Service 'sc.game.telemetry.v1.GameTelemetryService' registered
    <GameTelemetry> Local services server is running on 127.0.0.1:2942
    ```
 
-4. The stream only starts once your character has **spawned** (line `Initializing game telemetry component of local player`).
+5. The stream only starts once your character has **spawned** (line `Initializing game telemetry component of local player`). Until then, keys and the web page show "—".
 
 > Not verified here: the environment variable `GRPC_CLIENT_SERVER_ENABLED=true`
 > (set before starting the RSI Launcher, which passes it on to the game).
