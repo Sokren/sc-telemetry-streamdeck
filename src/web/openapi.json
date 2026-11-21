@@ -582,6 +582,91 @@
 					}
 				}
 			}
+		},
+		"/api/v1/layout": {
+			"get": {
+				"operationId": "getLayout",
+				"tags": [
+					"Layout"
+				],
+				"summary": "Button grid of the page — grille de boutons de la page",
+				"description": "Tiles of the web page with their current image (same drawings as the Stream Deck keys). Tile settings use the same names and values as the plugin's actions. — FR : tuiles de la page web avec leur image actuelle (mêmes dessins que les touches Stream Deck). Les réglages des tuiles reprennent les noms et valeurs des actions du plugin.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Grid — grille",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Layout"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
+		},
+		"/api/v1/layout/tiles/{index}/press": {
+			"post": {
+				"operationId": "pressTile",
+				"tags": [
+					"Layout"
+				],
+				"summary": "Press a tile — appuyer sur une tuile",
+				"description": "Same rules as the matching Stream Deck key; dangerous actions are never sent (alert). — FR : mêmes règles que la touche Stream Deck correspondante ; les actions dangereuses ne sont jamais envoyées (alert).",
+				"parameters": [
+					{
+						"name": "index",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"minimum": 0
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Feedback — retour",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TileFeedback"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "No tile at this index — pas de tuile à cet index",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"components": {
@@ -966,6 +1051,63 @@
 					},
 					"repeat": {
 						"type": "integer"
+					}
+				}
+			},
+			"Tile": {
+				"type": "object",
+				"required": [
+					"type",
+					"settings"
+				],
+				"properties": {
+					"type": {
+						"enum": [
+							"actor-action",
+							"actor-display",
+							"ship-toggle",
+							"ship-action",
+							"morse"
+						]
+					},
+					"settings": {
+						"type": "object",
+						"description": "actor-action: {action}; actor-display: {value}; ship-toggle: {function, mode, style}; ship-action: {action, mode}; morse: {text, unitMs, repeat}"
+					},
+					"image": {
+						"type": "string",
+						"description": "SVG data URI — FR : image SVG (data URI)"
+					}
+				}
+			},
+			"Layout": {
+				"type": "object",
+				"required": [
+					"tiles"
+				],
+				"properties": {
+					"tiles": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Tile"
+						}
+					}
+				}
+			},
+			"TileFeedback": {
+				"type": "object",
+				"required": [
+					"feedback"
+				],
+				"properties": {
+					"feedback": {
+						"enum": [
+							"ok",
+							"alert"
+						]
+					},
+					"detail": {
+						"type": "string"
 					}
 				}
 			}

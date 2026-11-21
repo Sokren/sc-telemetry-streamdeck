@@ -9,7 +9,9 @@ import type { TelemetryHub } from "../telemetry/hub.js";
 import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
 import { MorseControl } from "./morse-control.js";
+import { DEFAULT_LAYOUT } from "./layout.js";
 import { actionRoutes } from "./routes/actions.js";
+import { layoutRoutes } from "./routes/layout.js";
 import { morseRoutes } from "./routes/morse.js";
 import { shipRoutes } from "./routes/ship.js";
 import { telemetryRoutes } from "./routes/telemetry.js";
@@ -100,6 +102,7 @@ export function createApp(deps: AppDeps): App {
 		...telemetryRoutes(deps),
 		...shipRoutes(deps),
 		...morseRoutes({ morse }),
+		...layoutRoutes({ hub: deps.hub, game: deps.game, morse, layout: () => DEFAULT_LAYOUT }),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },
 		{
 			method: "GET",
