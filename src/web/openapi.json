@@ -307,6 +307,281 @@
 					}
 				}
 			}
+		},
+		"/api/v1/ship/functions": {
+			"get": {
+				"operationId": "listShipFunctions",
+				"tags": [
+					"Ship"
+				],
+				"summary": "Ship functions and their state — fonctions vaisseau et leur état",
+				"description": "The 17 ship functions of the Ship Toggle key with their live state. unknown: no ship data (game closed, character not seated); unavailable: the ship lacks the function. — FR : les 17 fonctions vaisseau de la touche Ship Toggle avec leur état réel. unknown : pas de données vaisseau (jeu fermé, perso pas assis) ; unavailable : le vaisseau n'a pas la fonction.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Functions — fonctions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/ShipFunctionState"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
+		},
+		"/api/v1/ship/functions/{id}": {
+			"get": {
+				"operationId": "getShipFunction",
+				"tags": [
+					"Ship"
+				],
+				"summary": "One ship function — une fonction vaisseau",
+				"description": "State of one ship function. — FR : état d'une fonction vaisseau.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/ShipFunctionId"
+						}
+					},
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Function — fonction",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ShipFunctionState"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "Unknown id — identifiant inconnu",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/ship/functions/{id}/press": {
+			"post": {
+				"operationId": "pressShipFunction",
+				"tags": [
+					"Ship"
+				],
+				"summary": "Press a ship function — appuyer sur une fonction vaisseau",
+				"description": "Same rules as the Ship Toggle key: toggle sends the command opposite to the state read; on / off do nothing if already in that state (noop). Main power and doors always act as on (turning off, opening and unlocking are excluded). 409 when the ship lacks the function or no safe command exists. — FR : mêmes règles que la touche Ship Toggle : toggle envoie la commande opposée à l'état lu ; on / off ne font rien si l'état est déjà atteint (noop). Puissance générale et portes agissent toujours comme on (couper, ouvrir et déverrouiller sont exclus). 409 si le vaisseau n'a pas la fonction ou si aucune commande sûre n'existe.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/ShipFunctionId"
+						}
+					}
+				],
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"mode": {
+										"enum": [
+											"toggle",
+											"on",
+											"off"
+										],
+										"default": "toggle"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Sent or nothing to do — envoyée ou rien à faire",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PressDone"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid mode — mode invalide",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "Unknown id — identifiant inconnu",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "Refused — refusée",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PressRefused"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Game refused or unreachable — refus du jeu ou jeu injoignable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PressFailed"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/morse": {
+			"post": {
+				"operationId": "startMorse",
+				"tags": [
+					"Morse"
+				],
+				"summary": "Flash the flashlight in Morse — torche en morse",
+				"description": "Starts a Morse code emission with the flashlight (A–Z, 0–9, spaces; accents removed). Same limits as the Morse Code key. The flashlight must be off at start (the game does not expose its state). — FR : lance une émission morse avec la torche (A–Z, 0–9, espaces ; accents retirés). Mêmes limites que la touche Morse Code. La torche doit être éteinte au départ (le jeu n'expose pas son état).",
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MorseRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"202": {
+						"description": "Started — lancée",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MorseSettings"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"409": {
+						"description": "Already playing — émission déjà en cours",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Nothing to send — rien à émettre",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "stopMorse",
+				"tags": [
+					"Morse"
+				],
+				"summary": "Stop the Morse emission — arrêter l'émission",
+				"description": "Stops the emission and restores the flashlight. — FR : arrête l'émission et remet la torche dans son état de départ.",
+				"responses": {
+					"204": {
+						"description": "Stopped — arrêtée"
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "Nothing playing — aucune émission",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"components": {
@@ -516,6 +791,181 @@
 							"bad",
 							"none"
 						]
+					}
+				}
+			},
+			"ShipFunctionId": {
+				"enum": [
+					"gear",
+					"lights",
+					"vtol",
+					"transform",
+					"decoupled",
+					"gsafe",
+					"proximity",
+					"esp",
+					"advanced_hud",
+					"night_vision",
+					"master_nav",
+					"power_engines",
+					"power_weapons",
+					"power_shields",
+					"power_main",
+					"doors_closed",
+					"doors_locked"
+				]
+			},
+			"ShipState": {
+				"enum": [
+					"on",
+					"off",
+					"moving-on",
+					"moving-off",
+					"unavailable",
+					"unknown"
+				]
+			},
+			"ShipFunctionState": {
+				"type": "object",
+				"required": [
+					"id",
+					"name",
+					"label",
+					"state",
+					"word"
+				],
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/ShipFunctionId"
+					},
+					"name": {
+						"type": "string"
+					},
+					"label": {
+						"type": "string",
+						"description": "Short key label — FR : libellé court de touche"
+					},
+					"state": {
+						"$ref": "#/components/schemas/ShipState"
+					},
+					"word": {
+						"type": "string",
+						"description": "State word as shown on the key (SORTI, ON, NAV, …, —) — FR : mot d'état affiché sur la touche"
+					}
+				}
+			},
+			"PressDone": {
+				"oneOf": [
+					{
+						"type": "object",
+						"required": [
+							"decision",
+							"action",
+							"ok"
+						],
+						"properties": {
+							"decision": {
+								"const": "sent"
+							},
+							"action": {
+								"type": "string"
+							},
+							"ok": {
+								"const": true
+							}
+						}
+					},
+					{
+						"type": "object",
+						"required": [
+							"decision"
+						],
+						"properties": {
+							"decision": {
+								"const": "noop"
+							}
+						}
+					}
+				]
+			},
+			"PressRefused": {
+				"type": "object",
+				"required": [
+					"decision",
+					"reason"
+				],
+				"properties": {
+					"decision": {
+						"const": "refused"
+					},
+					"reason": {
+						"type": "string"
+					}
+				}
+			},
+			"PressFailed": {
+				"type": "object",
+				"required": [
+					"decision",
+					"action",
+					"ok",
+					"reason"
+				],
+				"properties": {
+					"decision": {
+						"const": "sent"
+					},
+					"action": {
+						"type": "string"
+					},
+					"ok": {
+						"const": false
+					},
+					"reason": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					}
+				}
+			},
+			"MorseRequest": {
+				"type": "object",
+				"properties": {
+					"text": {
+						"type": "string",
+						"default": "SOS"
+					},
+					"unitMs": {
+						"type": "integer",
+						"minimum": 100,
+						"maximum": 2000,
+						"default": 400
+					},
+					"repeat": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 10,
+						"default": 1
+					}
+				}
+			},
+			"MorseSettings": {
+				"type": "object",
+				"required": [
+					"text",
+					"unitMs",
+					"repeat"
+				],
+				"properties": {
+					"text": {
+						"type": "string"
+					},
+					"unitMs": {
+						"type": "integer"
+					},
+					"repeat": {
+						"type": "integer"
 					}
 				}
 			}

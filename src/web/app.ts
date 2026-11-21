@@ -8,7 +8,10 @@ import type { GameApi } from "../game/types.js";
 import type { TelemetryHub } from "../telemetry/hub.js";
 import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
+import { MorseControl } from "./morse-control.js";
 import { actionRoutes } from "./routes/actions.js";
+import { morseRoutes } from "./routes/morse.js";
+import { shipRoutes } from "./routes/ship.js";
 import { telemetryRoutes } from "./routes/telemetry.js";
 import { vitalRoutes } from "./routes/vitals.js";
 
@@ -21,6 +24,8 @@ export type AppDeps = {
 	game: GameApi;
 	hub: TelemetryHub;
 	source: ActionSource;
+	/** Émission morse (par défaut : créée sur `game`). */
+	morse?: MorseControl;
 	/** Dossier de `swagger-ui-dist` (par défaut : résolu depuis node_modules). */
 	swaggerDir?: string;
 	/** Contrat OpenAPI (par défaut : `openapi.json` à côté de ce module). */
@@ -67,6 +72,7 @@ function defaultOpenapi(): unknown {
 export function createApp(deps: AppDeps): App {
 	const openapi = deps.openapi ?? defaultOpenapi();
 	const swaggerDir = deps.swaggerDir ?? defaultSwaggerDir();
+	const morse = deps.morse ?? new MorseControl(deps.game);
 	// Le flux du jeu reste ouvert tant que l'appli tourne (état toujours à jour pour l'API).
 	const unsubscribe = deps.hub.subscribe(() => {});
 
@@ -92,6 +98,8 @@ export function createApp(deps: AppDeps): App {
 		...actionRoutes(deps),
 		...vitalRoutes(deps),
 		...telemetryRoutes(deps),
+		...shipRoutes(deps),
+		...morseRoutes({ morse }),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },
 		{
 			method: "GET",
