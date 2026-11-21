@@ -62,6 +62,8 @@ function applyTexts() {
 	$("h-lights").textContent = t("warningLights");
 	$("h-functions").textContent = t("functions");
 	$("functions-hint").textContent = t("functionsHint");
+	$("h-emotes").textContent = t("emotes");
+	$("emotes-hint").textContent = t("emotesHint");
 }
 
 // ---------- Onglets ----------
@@ -138,6 +140,55 @@ function renderCharacter(c) {
 	$("char-vitals").replaceChildren(...c.vitals.map(card));
 }
 
+// ---------- Émotes (liste lue dans le jeu, comme la liste déroulante du plugin) ----------
+const EMOTES = "player_emotes";
+let emotesLoaded = false;
+
+async function loadEmotes() {
+	try {
+		const r = await fetch(`/api/v1/actions?lang=${lang}`, { headers: { authorization: `Bearer ${token}` } });
+		if (!r.ok) throw new Error(String(r.status));
+		const { groups, live } = await r.json();
+		const emotes = groups.find((g) => g.category === EMOTES)?.actions ?? [];
+		renderEmotes(emotes);
+		// Liste de secours (jeu pas encore joignable) : relue dès que le jeu répond.
+		emotesLoaded = live && emotes.length > 0;
+	} catch {
+		renderEmotes([]);
+	}
+}
+
+function renderEmotes(emotes) {
+	const box = $("char-emotes");
+	if (!emotes.length) {
+		const empty = document.createElement("p");
+		empty.className = "hint";
+		empty.textContent = t("emotesEmpty");
+		return box.replaceChildren(empty);
+	}
+	box.replaceChildren(
+		...emotes.map((e) => {
+			const el = document.createElement("button");
+			el.type = "button";
+			el.className = "card function emote";
+			el.innerHTML = '<div class="label"></div><span class="flash"></span>';
+			el.querySelector(".label").textContent = e.label;
+			el.addEventListener("click", () => triggerEmote(e.name, el));
+			return el;
+		}),
+	);
+}
+
+async function triggerEmote(name, el) {
+	try {
+		const r = await fetch(`/api/v1/actions/${encodeURIComponent(name)}/trigger`, { method: "POST", headers: { authorization: `Bearer ${token}` } });
+		if (r.status === 401) return showMessage(t("badToken"));
+		flashOn(el, r.status === 200 ? "ok" : "alert");
+	} catch {
+		flashOn(el, "alert");
+	}
+}
+
 // ---------- Vaisseau ----------
 async function pressFunction(id, el) {
 	try {
@@ -191,10 +242,12 @@ function renderShip(status, functions) {
 function connect() {
 	source?.close();
 	setStatus("", t("connecting"));
+	loadEmotes();
 	source = new EventSource(`/api/v1/events?t=${encodeURIComponent(token)}&lang=${lang}`);
 	source.addEventListener("status", (e) => {
 		const s = JSON.parse(e.data);
 		setStatus(s.telemetry === "live" ? "live" : "", s.telemetry === "live" ? t("live") : t("noData"));
+		if (s.telemetry === "live" && !emotesLoaded) loadEmotes();
 		// Jeu sans commandes d'actions (ex. 4.10) : l'affichage marche, pas les boutons.
 		$("notice").textContent = t("actionsUnsupported");
 		$("notice").hidden = s.actions !== "unsupported";

@@ -22,6 +22,9 @@ export const I18N = {
 		notInShip: "Pas dans un vaisseau (ou jeu fermé).",
 		landed: "posé",
 		flying: "en vol",
+		emotes: "Émotes",
+		emotesHint: "Clique sur une émote pour la jouer en jeu.",
+		emotesEmpty: "Liste des émotes indisponible pour le moment.",
 		actionsUnsupported: "Cette version du jeu ne permet pas de déclencher des actions (Star Citizen 5.0 requis). L'affichage des informations fonctionne.",
 	},
 	en: {
@@ -46,6 +49,9 @@ export const I18N = {
 		notInShip: "Not in a ship (or game closed).",
 		landed: "landed",
 		flying: "flying",
+		emotes: "Emotes",
+		emotesHint: "Click an emote to play it in game.",
+		emotesEmpty: "Emote list unavailable for now.",
 		actionsUnsupported: "This game version cannot trigger actions (Star Citizen 5.0 required). Information display works.",
 	},
 };

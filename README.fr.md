@@ -109,7 +109,7 @@ npm run start:web        # ouvre la page dans le navigateur (ajouter -- --no-ope
 npm run build:exe        # fabrique dist\sc-telemetry-web.exe (un seul fichier, Node SEA)
 ```
 
-- Page : `http://127.0.0.1:8743/` — l'appli l'ouvre avec le jeton d'accès inclus. Trois onglets : **Grille** (boutons), **Personnage** (position, rôle et les 13 constantes) et **Vaisseau** (instruments, voyants et les 17 fonctions, cliquables).
+- Page : `http://127.0.0.1:8743/` — l'appli l'ouvre avec le jeton d'accès inclus. Trois onglets : **Grille** (boutons), **Personnage** (position, rôle, les 13 constantes et les 34 émotes, cliquables) et **Vaisseau** (instruments, voyants et les 17 fonctions, cliquables).
 - Swagger UI : `http://127.0.0.1:8743/api/docs` — contrat : `/api/v1/openapi.json`.
 - Chaque appel à l'API demande le jeton (`Authorization: Bearer …`), enregistré dans `%APPDATA%\SC Telemetry Deck\settings.json`.
 - Cet aperçu n'écoute que **sur ce PC** (`127.0.0.1`). L'accès tablette / téléphone (QR code) et la grille modifiable arrivent aux étapes suivantes.

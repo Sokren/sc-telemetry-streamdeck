@@ -303,3 +303,17 @@ h2 {
 	color: var(--warn);
 	background: rgba(133, 79, 11, 0.15);
 }
+
+/* ---------- Émotes ---------- */
+.emote {
+	min-height: 56px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+.emote .label {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--text);
+}
