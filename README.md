@@ -121,6 +121,7 @@ Standalone Python scripts (`pip install grpcio protobuf`):
 |---|---|
 | `sc_extract_proto.py` | extracts the schema from `StarCitizen.exe` and compares it with an existing one |
 | `sc_champs_inconnus.py` | shows fields sent by the game but missing from the schema |
+| `sc_actions_diff.py` | after a patch: lists commands added / removed in `StarCitizen.exe` (no game needed) and triggerable actions added / removed (game running), updates `schema/actions.json` |
 | `sc_bridge.py` | HTTP/JSON → gRPC bridge (`http://127.0.0.1:8742/action/<name>`, `/state`, `/value/<path>`) |
 | `sc_morse.py` | flashes the flashlight in Morse code (`python sc_morse.py SOS`) |
 | `toggle_flashlight.pyw` | triggers the action named after the file, without a console window |

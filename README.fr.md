@@ -121,6 +121,7 @@ Scripts Python autonomes (`pip install grpcio protobuf`) :
 |---|---|
 | `sc_extract_proto.py` | extrait le schéma depuis `StarCitizen.exe` et le compare à un schéma existant |
 | `sc_champs_inconnus.py` | affiche les champs envoyés par le jeu mais absents du schéma |
+| `sc_actions_diff.py` | après un patch : liste les commandes ajoutées / retirées dans `StarCitizen.exe` (sans le jeu) et les actions déclenchables ajoutées / retirées (jeu lancé), met à jour `schema/actions.json` |
 | `sc_bridge.py` | pont HTTP/JSON → gRPC (`http://127.0.0.1:8742/action/<nom>`, `/state`, `/value/<chemin>`) |
 | `sc_morse.py` | fait clignoter la torche en morse (`python sc_morse.py SOS`) |
 | `toggle_flashlight.pyw` | déclenche l'action portant le nom du fichier, sans fenêtre console |
