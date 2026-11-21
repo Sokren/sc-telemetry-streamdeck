@@ -9,12 +9,12 @@ and on the [GitHub releases page](https://github.com/Sokren/sc-telemetry-streamd
 > **Beta** — the game's telemetry API is new, undocumented by CIG and may change with any patch.
 > 4.10.3 (LIVE) = display only, 5.0 (PTU) = display + actions.
 
-## [Unreleased]
+## [0.3.6] — 2026-11-21
 
 ### Added
-- **Ship Display**: **weapons ready to fire** ("1 / 2", colored gauge), **active weapon group** and **gimbals** (locked / free). Display only.
+- **Ship Display**: **weapons ready to fire** ("1 / 2", colored gauge), **active weapon group** ("All" for group 0, then 1, 2… as in game) and **gimbals** (locked / free). Display only.
 - Web app: **Weapons ready**, **Weapon group** and **Gimbals** instruments (Ship tab, API, views).
-- Web app: **🔁 Auto** — automatic view change per device: on foot / seated / EVA view, after 2 s in the same position, never while editing; a tab changed by hand is kept until the next change of position.
+- Web app: **🔁 Auto** — automatic view change per device: tab or view on foot / seated / EVA (default: on foot → *Character*, seated → *Ship*), after 2 s in the same position, never while editing; a tab changed by hand is kept until the next change of position.
 
 ## [0.3.5] — 2026-11-21
 
@@ -106,6 +106,7 @@ First release.
 ### Known issues
 - In 5.0 PTU the game accepts the `mobiglas` action but does not open the mobiGlas.
 
+[0.3.6]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.6
 [0.3.5]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.5
 [0.3.4]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.4
 [0.3.3]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.3
