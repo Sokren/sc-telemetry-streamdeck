@@ -5,6 +5,7 @@ import { ActorDisplayAction } from "./actions/actor-display-action.js";
 import { TRIGGER_TIMEOUT_MS } from "./actions/category-action.js";
 import { MorseCodeAction } from "./actions/morse-code-action.js";
 import { ShipAction } from "./actions/ship-action.js";
+import { ShipDisplayAction } from "./actions/ship-display-action.js";
 import { ShipToggleRegistered } from "./actions/ship-toggle-registered.js";
 import { toLang } from "./catalog/labels.js";
 import { ActionSource, readSnapshot } from "./catalog/source.js";
@@ -46,6 +47,14 @@ streamDeck.actions.registerAction(new MorseCodeAction({ player: morsePlayer, log
 const hub = new TelemetryHub(game);
 streamDeck.actions.registerAction(
 	new ActorDisplayAction({
+		hub,
+		lang: () => toLang(streamDeck.info.application.language ?? "en"),
+		sendToPropertyInspector: (payload) => streamDeck.ui.sendToPropertyInspector(payload),
+	}),
+);
+
+streamDeck.actions.registerAction(
+	new ShipDisplayAction({
 		hub,
 		lang: () => toLang(streamDeck.info.application.language ?? "en"),
 		sendToPropertyInspector: (payload) => streamDeck.ui.sendToPropertyInspector(payload),

@@ -10,6 +10,7 @@ import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
 import { isLoopback, LanManager } from "./lan.js";
 import { MorseControl } from "./morse-control.js";
+import { CountermeasureTracker } from "../display/countermeasures.js";
 import { ActionCapability } from "./capability.js";
 import { EventHub } from "./events.js";
 import { DEFAULT_LAYOUT } from "./layout.js";
@@ -106,8 +107,12 @@ export function createApp(deps: AppDeps): App {
 	const openapi = deps.openapi ?? defaultOpenapi();
 	const swaggerDir = deps.swaggerDir ?? defaultSwaggerDir();
 	const morse = deps.morse ?? new MorseControl(deps.game);
-	// Le flux du jeu reste ouvert tant que l'appli tourne (état toujours à jour pour l'API).
-	const unsubscribe = deps.hub.subscribe(() => {});
+	// Le flux du jeu reste ouvert tant que l'appli tourne (état toujours à jour pour l'API) ; il nourrit le suivi
+	// des contre-mesures (plus grand stock vu par modèle de vaisseau), même sans page ouverte.
+	const countermeasures = new CountermeasureTracker();
+	const unsubscribe = deps.hub.subscribe(() =>
+		countermeasures.observe({ weapons: deps.hub.section("weapons"), vehicle: deps.hub.section("vehicle"), actor: deps.hub.section("actor") }),
+	);
 	const layout = () => DEFAULT_LAYOUT;
 	const capability = deps.capability ?? new ActionCapability(deps.game);
 	const status = () => {
@@ -125,7 +130,7 @@ export function createApp(deps: AppDeps): App {
 	const save = deps.saveSettings ?? (() => {});
 	const lan = deps.lanFactory?.(deps.settings, save) ?? new LanManager({ settings: deps.settings, save, listen: async () => true, cards: () => [] });
 	const views = new ViewStore(deps.viewFile);
-	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status, views: (lang) => ({ views: views.list(lang) }) });
+	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status, countermeasures, views: (lang) => ({ views: views.list(lang) }) });
 	// Vue enregistrée (depuis n'importe quel appareil) → renvoyée à toutes les pages connectées.
 	const stopView = views.onChange(() => events.refresh());
 	// Changement de capacité (jeu relancé dans une autre version) → état renvoyé aux pages connectées.
@@ -150,7 +155,7 @@ export function createApp(deps: AppDeps): App {
 		...vitalRoutes(deps),
 		...telemetryRoutes(deps),
 		...shipRoutes(deps),
-		...panelRoutes(deps),
+		...panelRoutes({ hub: deps.hub, countermeasures }),
 		...morseRoutes({ morse }),
 		...viewsRoutes({ views }),
 		...lanRoutes({

@@ -9,6 +9,12 @@ and on the [GitHub releases page](https://github.com/Sokren/sc-telemetry-streamd
 > **Beta** — the game's telemetry API is new, undocumented by CIG and may change with any patch.
 > 4.10.3 (LIVE) = display only, 5.0 (PTU) = display + actions.
 
+## [Unreleased]
+
+### Added
+- **Ship Display** (Stream Deck): the ship's **countermeasures** live — decoys and noise together ("45 / 3") or one of them — on a key (value + colored gauge) or a Stream Deck + dial. 100 % = the largest stock seen for this ship model while a display is visible (the game does not send the maximum). Display only: the game exposes no command to fire countermeasures.
+- Web app: **Decoys** and **Noise** instruments in the *Ship* tab, the API and the views' *Add* menu.
+
 ## [0.3.4] — 2026-11-21
 
 Web app only (Stream Deck plugin unchanged since 0.3.2).

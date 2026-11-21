@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { describe, expect, test } from "vitest";
+import { CountermeasureTracker } from "../../src/display/countermeasures.js";
 import { characterOf, shipStatusOf } from "../../src/web/panels.js";
 import en from "../../src/web/labels.en.json" with { type: "json" };
 import fr from "../../src/web/labels.fr.json" with { type: "json" };
@@ -59,7 +60,7 @@ describe("shipStatusOf", () => {
 		expect(by.speed).toMatchObject({ text: "0", unit: "m/s", level: "none" });
 		expect(by.radar_altitude).toMatchObject({ text: "4", unit: "m" });
 		expect(by.heading).toMatchObject({ text: "0", unit: "°" });
-		expect(s.instruments.map((i) => i.id)).toEqual(["shields", "hull", "hydrogen", "quantum", "speed", "radar_altitude", "heading"]);
+		expect(s.instruments.map((i) => i.id)).toEqual(["shields", "hull", "decoys", "noise", "hydrogen", "quantum", "speed", "radar_altitude", "heading"]);
 	});
 
 	test("voyants : 10, état et clignotement", () => {
@@ -95,5 +96,40 @@ describe("shipStatusOf", () => {
 		const s = shipStatusOf(withVehicle((st) => delete st.shields), titan.actor, "fr");
 		expect(s.instruments.find((i) => i.id === "shields")).toMatchObject({ text: "—", level: "none" });
 		expect(s.instruments.some((i) => i.id === ("altitude" as never))).toBe(false);
+	});
+
+	test("contre-mesures (capture du Prospector) : nombre, pourcentage du plus grand stock vu, couleur", () => {
+		const tracker = new CountermeasureTracker();
+		const weapons = (d: number, n: number) => ({
+			countermeasures: [
+				{ type: "COUNTERMEASURE_TYPE_DECOY", amount: d },
+				{ type: "COUNTERMEASURE_TYPE_NOISE", amount: n },
+			],
+		});
+		shipStatusOf(titan.vehicle, titan.actor, "fr", { weapons: weapons(48, 5), tracker });
+		const s = shipStatusOf(titan.vehicle, titan.actor, "fr", { weapons: weapons(45, 1), tracker });
+		const by = Object.fromEntries(s.instruments.map((i) => [i.id, i]));
+		expect(by.decoys).toMatchObject({ label: "Leurres", text: "45", unit: "", level: "ok" });
+		expect(by.decoys.percent).toBeCloseTo(93.75);
+		expect(by.noise).toMatchObject({ label: "Brouilleurs", text: "1", unit: "", percent: 20, level: "bad" });
+		expect(shipStatusOf(titan.vehicle, titan.actor, "en", { weapons: weapons(45, 1), tracker }).instruments.find((i) => i.id === "noise")?.label).toBe("Noise");
+	});
+
+	test("contre-mesures sans section weapons, ou type absent → « — »", () => {
+		const tracker = new CountermeasureTracker();
+		for (const cm of [undefined, { tracker }, { weapons: { countermeasures: [] }, tracker }]) {
+			const s = shipStatusOf(titan.vehicle, titan.actor, "fr", cm);
+			for (const id of ["decoys", "noise"]) expect(s.instruments.find((i) => i.id === id)).toMatchObject({ text: "—", level: "none" });
+		}
+	});
+
+	test("contre-mesures : même règle que la touche quand la section vehicle est en retard", () => {
+		const tracker = new CountermeasureTracker();
+		const weapons = { countermeasures: [{ type: "COUNTERMEASURE_TYPE_DECOY", amount: 45 }] };
+		const s = shipStatusOf(undefined, titan.actor, "fr", { weapons, tracker });
+		expect(s.available).toBe(false);
+		expect(s.instruments.find((i) => i.id === "decoys")).toMatchObject({ text: "45" });
+		const onFoot = shipStatusOf(undefined, { state: { locomotion: "ACTOR_LOCOMOTION_STATE_ON_FOOT" } }, "fr", { weapons, tracker });
+		expect(onFoot.instruments.find((i) => i.id === "decoys")).toMatchObject({ text: "—" });
 	});
 });

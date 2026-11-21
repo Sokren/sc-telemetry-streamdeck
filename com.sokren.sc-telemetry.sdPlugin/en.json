@@ -18,6 +18,15 @@
 			}
 		}
 	},
+	"com.sokren.sc-telemetry.ship-display": {
+		"Name": "Ship Display",
+		"Tooltip": "Shows the ship's countermeasures (decoys / noise) with a colored gauge.",
+		"Encoder": {
+			"TriggerDescription": {
+				"Rotate": "Change value"
+			}
+		}
+	},
 	"com.sokren.sc-telemetry.ship-toggle": {
 		"Name": "Ship Toggle",
 		"Tooltip": "Ship function with live state: landing gear, lights, VTOL, decoupled, G-safe, power…"

@@ -12,7 +12,7 @@ const DRAG_THRESHOLD = 6;
 const UNLOCK_KEY = "sctd-view-unlocked";
 const EMOTES = "player_emotes";
 /** Valeurs affichées en jauge (barre), pour le type indiqué dans le menu « Ajouter ». */
-const GAUGES = ["health", "oxygen", "hunger", "thirst", "body_temperature", "shields", "hull", "hydrogen", "quantum"];
+const GAUGES = ["health", "oxygen", "hunger", "thirst", "body_temperature", "shields", "hull", "decoys", "noise", "hydrogen", "quantum"];
 
 const el = (tag, cls, text) => {
 	const e = document.createElement(tag);

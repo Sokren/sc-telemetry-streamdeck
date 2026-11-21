@@ -1,4 +1,5 @@
 import type { Lang } from "../catalog/labels.js";
+import type { CountermeasureTracker } from "../display/countermeasures.js";
 import { DISPLAY_VALUES } from "../display/values.js";
 import en from "./labels.en.json" with { type: "json" };
 import fr from "./labels.fr.json" with { type: "json" };
@@ -48,7 +49,7 @@ export function characterOf(actor: Obj | undefined, lang: Lang): Character {
 	};
 }
 
-export type InstrumentId = "shields" | "hull" | "hydrogen" | "quantum" | "speed" | "radar_altitude" | "heading";
+export type InstrumentId = "shields" | "hull" | "decoys" | "noise" | "hydrogen" | "quantum" | "speed" | "radar_altitude" | "heading";
 export type Instrument = { id: InstrumentId; label: string; text: string; unit: string; percent?: number; level: Level };
 export type AnnunciatorId = "pwr" | "wpn" | "thr" | "shld" | "cool" | "qdrv" | "radr" | "prox" | "hit" | "misl";
 export type Annunciator = {
@@ -67,7 +68,7 @@ export type ShipStatus = {
 	annunciators: Annunciator[];
 };
 
-export const INSTRUMENTS: readonly InstrumentId[] = ["shields", "hull", "hydrogen", "quantum", "speed", "radar_altitude", "heading"];
+export const INSTRUMENTS: readonly InstrumentId[] = ["shields", "hull", "decoys", "noise", "hydrogen", "quantum", "speed", "radar_altitude", "heading"];
 const ANNUNCIATORS: readonly AnnunciatorId[] = ["pwr", "wpn", "thr", "shld", "cool", "qdrv", "radr", "prox", "hit", "misl"];
 const MASTER: Record<string, "nav" | "scm" | "stealth"> = {
 	VEHICLE_MASTER_MODE_NAVIGATION: "nav",
@@ -108,15 +109,25 @@ function annunciator(x: unknown): Pick<Annunciator, "state" | "flashing"> {
 	}
 }
 
+/** Contre-mesures : section `weapons` du flux et suivi du plus grand stock vu (le jeu ne donne pas le maximum). */
+export type ShipCountermeasures = { weapons?: Obj; tracker: CountermeasureTracker };
+
 /**
  * Onglet Vaisseau : nom, posé, mode, instruments et voyants. Mêmes règles que les touches :
  * pas de section `vehicle`, ou perso pas assis → indisponible (« — »).
  */
-export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, lang: Lang): ShipStatus {
+export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, lang: Lang, cm?: ShipCountermeasures): ShipStatus {
 	const t = TABLES[lang];
 	const seated = !actor || obj(actor.state)?.locomotion === "ACTOR_LOCOMOTION_STATE_SEATED";
 	const state = seated ? obj(vehicle?.state) : undefined;
 	const none = (id: InstrumentId): Instrument => ({ id, label: t.instruments[id], text: "—", unit: "", level: "none" });
+	// Contre-mesures : même règle que la touche Ship Display (section `weapons` fraîche, perso assis), même si
+	// la section `vehicle` est en retard.
+	const countermeasure = (id: "decoys" | "noise"): Instrument => {
+		const r = cm ? cm.tracker.read(id === "decoys" ? "decoy" : "noise", { weapons: cm.weapons, vehicle, actor }) : undefined;
+		if (!r?.available) return none(id);
+		return { id, label: t.instruments[id], text: String(r.amount), unit: "", percent: r.percent, level: r.level };
+	};
 	if (!state) {
 		return {
 			available: false,
@@ -124,7 +135,7 @@ export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, l
 			landed: null,
 			masterMode: null,
 			masterModeLabel: "—",
-			instruments: INSTRUMENTS.map(none),
+			instruments: INSTRUMENTS.map((id) => (id === "decoys" || id === "noise" ? countermeasure(id) : none(id))),
 			annunciators: ANNUNCIATORS.map((id) => ({ id, label: t.annunciators[id], state: "unknown", flashing: false })),
 		};
 	}
@@ -141,6 +152,8 @@ export function shipStatusOf(vehicle: Obj | undefined, actor: Obj | undefined, l
 	const instruments: Instrument[] = [
 		gauge("shields", shields ? num(shields.level) : undefined),
 		gauge("hull", num(state.health)),
+		countermeasure("decoys"),
+		countermeasure("noise"),
 		gauge("hydrogen", instr ? num(instr.hydrogen_fuel) : undefined),
 		gauge("quantum", instr ? num(instr.quantum_fuel) : undefined),
 		plain("speed", instr ? num(instr.speed) : undefined, "m/s"),

@@ -3,6 +3,7 @@ import type { Lang } from "../catalog/labels.js";
 import { DISPLAY_VALUES } from "../display/values.js";
 import type { GameApi } from "../game/types.js";
 import { SHIP_FUNCTION_IDS } from "../ship/functions.js";
+import type { CountermeasureTracker } from "../display/countermeasures.js";
 import type { TelemetryHub } from "../telemetry/hub.js";
 import type { Tile } from "./layout.js";
 import type { MorseControl } from "./morse-control.js";
@@ -17,6 +18,8 @@ export type EventHubDeps = {
 	morse: MorseControl;
 	layout: () => readonly Tile[];
 	status: () => unknown;
+	/** Contre-mesures : plus grand stock vu par modèle de vaisseau (partagé avec l'API). */
+	countermeasures?: CountermeasureTracker;
 	/** Vues « Ma vue » dans la langue du client (`{ views }`, envoyées à la connexion et quand elles changent). */
 	views?: (lang: Lang) => unknown;
 	/** Intervalle minimal entre deux envois (défaut 250 ms). */
@@ -128,7 +131,12 @@ export class EventHub {
 			vitals: DISPLAY_VALUES.map((id) => vitalOf(id, actor, c.lang)),
 			ship: SHIP_FUNCTION_IDS.map((id) => shipStateOf(id, this.deps.hub, c.lang)),
 			character: characterOf(actor, c.lang),
-			shipStatus: shipStatusOf(this.deps.hub.section("vehicle"), actor, c.lang),
+			shipStatus: shipStatusOf(
+				this.deps.hub.section("vehicle"),
+				actor,
+				c.lang,
+				this.deps.countermeasures && { weapons: this.deps.hub.section("weapons"), tracker: this.deps.countermeasures },
+			),
 		});
 		if (state !== c.state) {
 			c.state = state;

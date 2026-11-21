@@ -14,6 +14,9 @@
 		"radiation": { "short": "Radia.", "long": "Rayonnement" },
 		"intoxication": { "short": "Intox.", "long": "Intoxication" },
 		"breathable": { "short": "Air", "long": "Atmosphère respirable" },
-		"balance": { "short": "Solde", "long": "Solde" }
+		"balance": { "short": "Solde", "long": "Solde" },
+		"countermeasures": { "short": "C-mesures", "long": "Contre-mesures (leurres / brouilleurs)" },
+		"decoys": { "short": "Leurres", "long": "Leurres" },
+		"noise": { "short": "Brouill.", "long": "Brouilleurs" }
 	}
 }

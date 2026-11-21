@@ -18,6 +18,15 @@
 			}
 		}
 	},
+	"com.sokren.sc-telemetry.ship-display": {
+		"Name": "Ship Display",
+		"Tooltip": "Affiche les contre-mesures du vaisseau (leurres / brouilleurs) avec une jauge colorée.",
+		"Encoder": {
+			"TriggerDescription": {
+				"Rotate": "Changer de donnée"
+			}
+		}
+	},
 	"com.sokren.sc-telemetry.ship-toggle": {
 		"Name": "Ship Toggle",
 		"Tooltip": "Fonction du vaisseau avec son état réel : train, phares, VTOL, découplage, G-safe, puissance…"

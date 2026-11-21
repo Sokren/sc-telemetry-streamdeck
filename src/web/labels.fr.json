@@ -5,6 +5,8 @@
 	"instruments": {
 		"shields": "Boucliers",
 		"hull": "Coque",
+		"decoys": "Leurres",
+		"noise": "Brouilleurs",
 		"hydrogen": "Hydrogène",
 		"quantum": "Quantum",
 		"speed": "Vitesse",

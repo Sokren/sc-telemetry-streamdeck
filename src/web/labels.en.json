@@ -5,6 +5,8 @@
 	"instruments": {
 		"shields": "Shields",
 		"hull": "Hull",
+		"decoys": "Decoys",
+		"noise": "Noise",
 		"hydrogen": "Hydrogen",
 		"quantum": "Quantum",
 		"speed": "Speed",

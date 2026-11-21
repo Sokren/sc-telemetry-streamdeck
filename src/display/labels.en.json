@@ -14,6 +14,9 @@
 		"radiation": { "short": "Rad.", "long": "Radiation" },
 		"intoxication": { "short": "Intox.", "long": "Intoxication" },
 		"breathable": { "short": "Air", "long": "Breathable air" },
-		"balance": { "short": "Funds", "long": "Balance" }
+		"balance": { "short": "Funds", "long": "Balance" },
+		"countermeasures": { "short": "Counterm.", "long": "Countermeasures (decoys / noise)" },
+		"decoys": { "short": "Decoys", "long": "Decoys" },
+		"noise": { "short": "Noise", "long": "Noise" }
 	}
 }

@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Ship Display</title>
+		<meta charset="utf-8" />
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+	</head>
+	<body>
+		<!-- Liste fournie par le plugin (événement « getValues »), libellés dans la langue du logiciel Stream Deck. -->
+		<sdpi-item label="Donnée / Value">
+			<sdpi-select setting="value" datasource="getValues" hot-reload default="countermeasures"></sdpi-select>
+		</sdpi-item>
+		<sdpi-item>
+			<p>
+				Stream Deck + : tourner la molette change la donnée affichée. « — » : jeu fermé, perso pas assis, ou vaisseau sans ce type de contre-mesure. 100 % = le plus grand stock vu pour ce modèle de vaisseau pendant qu'un afficheur est visible (le jeu ne donne pas le maximum). Le jeu ne permet pas de lancer des contre-mesures depuis une touche.<br />
+				Stream Deck +: rotate the dial to change the value. "—": game closed, character not seated, or ship without this countermeasure type. 100% = the largest stock seen for this ship model while a display is visible (the game does not send the maximum). The game does not allow firing countermeasures from a key.
+			</p>
+		</sdpi-item>
+	</body>
+</html>

@@ -60,6 +60,29 @@
 			]
 		},
 		{
+			"Name": "Ship Display",
+			"UUID": "com.sokren.sc-telemetry.ship-display",
+			"Icon": "imgs/actions/ship-display/icon",
+			"Tooltip": "Shows the ship's countermeasures (decoys / noise) with a colored gauge.",
+			"PropertyInspectorPath": "ui/ship-display.html",
+			"Controllers": [
+				"Keypad",
+				"Encoder"
+			],
+			"Encoder": {
+				"layout": "layouts/actor-display.json",
+				"TriggerDescription": {
+					"Rotate": "Change value"
+				}
+			},
+			"States": [
+				{
+					"Image": "imgs/actions/ship-display/key",
+					"ShowTitle": false
+				}
+			]
+		},
+		{
 			"Name": "Ship Toggle",
 			"UUID": "com.sokren.sc-telemetry.ship-toggle",
 			"Icon": "imgs/actions/ship-toggle/icon",
