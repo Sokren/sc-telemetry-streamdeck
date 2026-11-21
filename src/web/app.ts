@@ -56,7 +56,19 @@ const DOCS_PAGE = `<!doctype html>
 <body>
 <div id="swagger-ui"></div>
 <script src="/api/docs/swagger-ui-bundle.js"></script>
-<script>SwaggerUIBundle({ url: "/api/v1/openapi.json", dom_id: "#swagger-ui", persistAuthorization: true });</script>
+<script>
+// Le jeton mémorisé par la page de l'appli (même origine) est repris automatiquement : pas besoin de « Authorize ».
+const ui = SwaggerUIBundle({
+	url: "/api/v1/openapi.json",
+	dom_id: "#swagger-ui",
+	persistAuthorization: true,
+	onComplete: () => {
+		let token = null;
+		try { token = localStorage.getItem("sctd-token"); } catch (e) { /* stockage indisponible */ }
+		if (token) ui.preauthorizeApiKey("bearerAuth", token);
+	},
+});
+</script>
 </body>
 </html>
 `;

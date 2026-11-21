@@ -60,6 +60,13 @@ describe("contrat OpenAPI", () => {
 		expect(js.headers.get("content-type")).toContain("javascript");
 	});
 
+	test("Swagger UI reprend le jeton mémorisé par la page (même origine), sans l'écrire dans la page", async () => {
+		const ui = await s.call("GET", "/api/docs", { auth: false });
+		expect(ui.body).toContain('localStorage.getItem("sctd-token")');
+		expect(ui.body).toContain('preauthorizeApiKey("bearerAuth"');
+		expect(ui.body).not.toContain(s.token);
+	});
+
 	test("le jeton est aussi accepté dans l'URL (?t=)", async () => {
 		const r = await s.call("GET", `/api/v1/status?t=${s.token}`, { auth: false });
 		expect(r.status).toBe(200);
