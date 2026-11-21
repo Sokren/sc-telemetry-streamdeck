@@ -8,6 +8,9 @@ import type { GameApi } from "../game/types.js";
 import type { TelemetryHub } from "../telemetry/hub.js";
 import type { WebSettings } from "./config.js";
 import { createHandler, type Route } from "./http.js";
+import { actionRoutes } from "./routes/actions.js";
+import { telemetryRoutes } from "./routes/telemetry.js";
+import { vitalRoutes } from "./routes/vitals.js";
 
 /** Ce dont l'appli a besoin ; complété au fil des étapes. */
 export type AppDeps = {
@@ -86,6 +89,9 @@ export function createApp(deps: AppDeps): App {
 				};
 			},
 		},
+		...actionRoutes(deps),
+		...vitalRoutes(deps),
+		...telemetryRoutes(deps),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },
 		{
 			method: "GET",

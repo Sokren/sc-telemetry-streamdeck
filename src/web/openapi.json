@@ -4,32 +4,307 @@
 		"title": "SC Telemetry Deck API",
 		"version": "1.0.0",
 		"description": "Local API to read Star Citizen's state and trigger game actions through SC Telemetry Deck. Requires the token shown by the app (Authorization: Bearer …). Dangerous actions (self destruct, eject, opening doors…) are always refused. — FR : API locale pour lire l'état de Star Citizen et déclencher des actions du jeu via SC Telemetry Deck. Demande le jeton affiché par l'appli (Authorization: Bearer …). Les actions dangereuses (autodestruction, éjection, ouverture des portes…) sont toujours refusées.",
-		"license": { "name": "Unofficial community project — projet communautaire non officiel" }
+		"license": {
+			"name": "Unofficial community project — projet communautaire non officiel"
+		}
 	},
-	"servers": [{ "url": "http://127.0.0.1:8743", "description": "This PC — ce PC" }],
-	"security": [{ "bearerAuth": [] }],
+	"servers": [
+		{
+			"url": "http://127.0.0.1:8743",
+			"description": "This PC — ce PC"
+		}
+	],
+	"security": [
+		{
+			"bearerAuth": []
+		}
+	],
 	"paths": {
 		"/api/v1/status": {
 			"get": {
 				"operationId": "getStatus",
-				"tags": ["General"],
+				"tags": [
+					"General"
+				],
 				"summary": "App and game status — état de l'appli et du jeu",
 				"description": "Whether telemetry is being received and whether the character has spawned. — FR : indique si la télémétrie est reçue et si le personnage est apparu.",
 				"responses": {
-					"200": { "description": "Status — état", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Status" } } } },
-					"401": { "$ref": "#/components/responses/Unauthorized" }
+					"200": {
+						"description": "Status — état",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Status"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
 				}
 			}
 		},
 		"/api/v1/openapi.json": {
 			"get": {
 				"operationId": "getOpenApi",
-				"tags": ["General"],
+				"tags": [
+					"General"
+				],
 				"summary": "This contract — ce contrat",
 				"description": "OpenAPI description of this API, readable without token. — FR : description OpenAPI de cette API, lisible sans jeton.",
 				"security": [],
 				"responses": {
-					"200": { "description": "OpenAPI document — document OpenAPI", "content": { "application/json": { "schema": { "type": "object" } } } }
+					"200": {
+						"description": "OpenAPI document — document OpenAPI",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/actions": {
+			"get": {
+				"operationId": "listActions",
+				"tags": [
+					"Actions"
+				],
+				"summary": "Triggerable actions — actions déclenchables",
+				"description": "Actions the game accepts, grouped by category, with labels. Comes from the running game, or from the embedded snapshot when the game is closed (live: false). Dangerous actions are never listed. — FR : actions acceptées par le jeu, groupées par catégorie, avec libellés. Liste du jeu en marche, ou instantané embarqué quand le jeu est fermé (live: false). Les actions dangereuses ne sont jamais listées.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Action list — liste des actions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ActionList"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
+		},
+		"/api/v1/actions/{name}/trigger": {
+			"post": {
+				"operationId": "triggerAction",
+				"tags": [
+					"Actions"
+				],
+				"summary": "Trigger an action — déclencher une action",
+				"description": "Triggers a game action by name (e.g. emote_wave, v_lights_on). Dangerous actions are refused with 403. 502 when the game refuses or cannot be reached. — FR : déclenche une action du jeu par son nom (ex. emote_wave, v_lights_on). Les actions dangereuses sont refusées (403). 502 si le jeu refuse ou est injoignable.",
+				"parameters": [
+					{
+						"name": "name",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "Action name — nom de l'action"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Triggered — déclenchée",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TriggerOk"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"403": {
+						"description": "Dangerous action refused — action dangereuse refusée",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Game refused or unreachable — refus du jeu ou jeu injoignable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TriggerFailure"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/vitals": {
+			"get": {
+				"operationId": "listVitals",
+				"tags": [
+					"Character"
+				],
+				"summary": "Character vitals — constantes du perso",
+				"description": "The 13 character vitals as shown by the Actor Display key. available: false when the game is closed or the character has not spawned. — FR : les 13 constantes du perso telles qu'affichées par la touche Actor Display. available: false si le jeu est fermé ou le perso pas apparu.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Vitals — constantes",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Vital"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
+		},
+		"/api/v1/vitals/{id}": {
+			"get": {
+				"operationId": "getVital",
+				"tags": [
+					"Character"
+				],
+				"summary": "One vital — une constante",
+				"description": "One character vital by id. — FR : une constante du perso par son identifiant.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/VitalId"
+						}
+					},
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Vital — constante",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Vital"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "Unknown id — identifiant inconnu",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/telemetry/{section}": {
+			"get": {
+				"operationId": "getTelemetrySection",
+				"tags": [
+					"Telemetry"
+				],
+				"summary": "Raw telemetry section — section brute du flux",
+				"description": "Last raw section of the game's telemetry stream (actor, vehicle, weapons…) as decoded with the game schema, if received in the last 3 s. For advanced uses; the structure follows the game and may change with patches. — FR : dernière section brute du flux de télémétrie (actor, vehicle, weapons…) telle que décodée avec le schéma du jeu, si reçue dans les 3 dernières secondes. Pour usages avancés ; la structure suit le jeu et peut changer à chaque patch.",
+				"parameters": [
+					{
+						"name": "section",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "actor, vehicle, weapons, events, force_feedback, turret"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Section",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "No recent data — pas de données récentes",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -45,24 +320,203 @@
 		"responses": {
 			"Unauthorized": {
 				"description": "Missing or wrong token — jeton absent ou faux",
-				"content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Error"
+						}
+					}
+				}
 			}
 		},
 		"schemas": {
 			"Error": {
 				"type": "object",
-				"required": ["error"],
-				"properties": { "error": { "type": "string" } }
+				"required": [
+					"error"
+				],
+				"properties": {
+					"error": {
+						"type": "string"
+					}
+				}
 			},
 			"Status": {
 				"type": "object",
-				"required": ["app", "version", "telemetry", "character", "schema"],
+				"required": [
+					"app",
+					"version",
+					"telemetry",
+					"character",
+					"schema"
+				],
 				"properties": {
-					"app": { "const": "sc-telemetry-web" },
-					"version": { "type": "string" },
-					"telemetry": { "enum": ["live", "no_data"], "description": "live: frames received in the last 3 s — FR : images reçues dans les 3 dernières secondes" },
-					"character": { "enum": ["spawned", "unknown"] },
-					"schema": { "type": "string", "description": "Game version of the embedded schema — FR : version du jeu du schéma embarqué" }
+					"app": {
+						"const": "sc-telemetry-web"
+					},
+					"version": {
+						"type": "string"
+					},
+					"telemetry": {
+						"enum": [
+							"live",
+							"no_data"
+						],
+						"description": "live: frames received in the last 3 s — FR : images reçues dans les 3 dernières secondes"
+					},
+					"character": {
+						"enum": [
+							"spawned",
+							"unknown"
+						]
+					},
+					"schema": {
+						"type": "string",
+						"description": "Game version of the embedded schema — FR : version du jeu du schéma embarqué"
+					}
+				}
+			},
+			"ActionList": {
+				"type": "object",
+				"required": [
+					"live",
+					"groups"
+				],
+				"properties": {
+					"live": {
+						"type": "boolean",
+						"description": "true: list from the running game; false: embedded snapshot — FR : true : liste du jeu ; false : instantané embarqué"
+					},
+					"groups": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": [
+								"category",
+								"label",
+								"actions"
+							],
+							"properties": {
+								"category": {
+									"type": "string"
+								},
+								"label": {
+									"type": "string"
+								},
+								"actions": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"required": [
+											"name",
+											"label",
+											"holdable"
+										],
+										"properties": {
+											"name": {
+												"type": "string"
+											},
+											"label": {
+												"type": "string"
+											},
+											"holdable": {
+												"type": "boolean"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"TriggerOk": {
+				"type": "object",
+				"required": [
+					"ok"
+				],
+				"properties": {
+					"ok": {
+						"const": true
+					}
+				}
+			},
+			"TriggerFailure": {
+				"type": "object",
+				"required": [
+					"ok",
+					"reason"
+				],
+				"properties": {
+					"ok": {
+						"const": false
+					},
+					"reason": {
+						"type": "string",
+						"description": "Game status (TRIGGER_GAME_ACTION_STATUS_…) or gRPC code (UNAVAILABLE…) — FR : statut du jeu ou code gRPC"
+					},
+					"message": {
+						"type": "string"
+					}
+				}
+			},
+			"VitalId": {
+				"enum": [
+					"health",
+					"oxygen",
+					"hunger",
+					"thirst",
+					"body_temperature",
+					"external_temperature",
+					"heart_rate",
+					"gravity",
+					"pressure",
+					"radiation",
+					"intoxication",
+					"breathable",
+					"balance"
+				]
+			},
+			"Vital": {
+				"type": "object",
+				"required": [
+					"id",
+					"label",
+					"available",
+					"text",
+					"unit",
+					"level"
+				],
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/VitalId"
+					},
+					"label": {
+						"type": "string"
+					},
+					"available": {
+						"type": "boolean"
+					},
+					"text": {
+						"type": "string",
+						"description": "Formatted value, \"—\" when unavailable — FR : valeur mise en forme, « — » si indisponible"
+					},
+					"unit": {
+						"type": "string"
+					},
+					"percent": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 100
+					},
+					"level": {
+						"enum": [
+							"ok",
+							"warn",
+							"bad",
+							"none"
+						]
+					}
 				}
 			}
 		}
