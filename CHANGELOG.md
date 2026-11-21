@@ -9,7 +9,7 @@ and on the [GitHub releases page](https://github.com/Sokren/sc-telemetry-streamd
 > **Beta** — the game's telemetry API is new, undocumented by CIG and may change with any patch.
 > 4.10.3 (LIVE) = display only, 5.0 (PTU) = display + actions.
 
-## [Unreleased]
+## [0.3.5] — 2026-11-21
 
 ### Added
 - **Ship Display** (Stream Deck): the ship's **countermeasures** live — decoys and noise together ("45 / 3") or one of them — on a key (value + colored gauge) or a Stream Deck + dial. 100 % = the largest stock seen for this ship model while a display is visible (the game does not send the maximum). Display only: the game exposes no command to fire countermeasures.
@@ -99,6 +99,7 @@ First release.
 ### Known issues
 - In 5.0 PTU the game accepts the `mobiglas` action but does not open the mobiGlas.
 
+[0.3.5]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.5
 [0.3.4]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.4
 [0.3.3]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.3
 [0.3.2]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.2

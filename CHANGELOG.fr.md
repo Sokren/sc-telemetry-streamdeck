@@ -9,7 +9,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/) ; les note
 > **Bêta** — l'API de télémétrie du jeu est récente, non documentée par CIG et peut changer à chaque patch.
 > 4.10.3 (LIVE) = affichage seulement, 5.0 (PTU) = affichage + actions.
 
-## [Non publié]
+## [0.3.5] — 2026-11-21
 
 ### Ajouté
 - **Ship Display** (Stream Deck) : les **contre-mesures** du vaisseau en direct — leurres et brouilleurs ensemble (« 45 / 3 ») ou l'un des deux — sur une touche (valeur + jauge colorée) ou une molette de Stream Deck +. 100 % = le plus grand stock vu pour ce modèle de vaisseau pendant qu'un afficheur est visible (le jeu n'envoie pas le maximum). Affichage seulement : le jeu n'expose aucune commande pour lancer des contre-mesures.
@@ -106,6 +106,7 @@ Première version.
 ### Problèmes connus
 - En 5.0 PTU, le jeu accepte l'action `mobiglas` mais n'ouvre pas le mobiGlas.
 
+[0.3.5]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.5
 [0.3.4]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.4
 [0.3.3]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.3
 [0.3.2]: https://github.com/Sokren/sc-telemetry-streamdeck/releases/tag/v0.3.2
