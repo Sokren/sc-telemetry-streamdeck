@@ -71,7 +71,6 @@ function applyTexts() {
 
 // ---------- À propos ----------
 const REPO = "https://github.com/Sokren/sc-telemetry-streamdeck";
-const VIDEO = "https://youtu.be/t30sASa_oD4";
 let lastStatus = {};
 
 function renderAbout() {
@@ -104,7 +103,6 @@ function renderAbout() {
 		...[
 			[t("aboutGithub"), REPO],
 			[t("aboutIssues"), `${REPO}/issues`],
-			[t("aboutVideo"), VIDEO],
 		].map(([label, href]) => {
 			const a = document.createElement("a");
 			a.href = href;
