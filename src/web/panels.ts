@@ -67,7 +67,7 @@ export type ShipStatus = {
 	annunciators: Annunciator[];
 };
 
-const INSTRUMENTS: readonly InstrumentId[] = ["shields", "hull", "hydrogen", "quantum", "speed", "radar_altitude", "heading"];
+export const INSTRUMENTS: readonly InstrumentId[] = ["shields", "hull", "hydrogen", "quantum", "speed", "radar_altitude", "heading"];
 const ANNUNCIATORS: readonly AnnunciatorId[] = ["pwr", "wpn", "thr", "shld", "cool", "qdrv", "radr", "prox", "hit", "misl"];
 const MASTER: Record<string, "nav" | "scm" | "stealth"> = {
 	VEHICLE_MASTER_MODE_NAVIGATION: "nav",

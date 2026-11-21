@@ -1,6 +1,7 @@
 // Page de SC Telemetry Deck : grille de tuiles, onglets Personnage et Vaisseau, état en direct
 // (Server-Sent Events), appuis. Utilise uniquement l'API publique v1 (la même que n'importe quel autre logiciel).
 import { I18N } from "./i18n.js";
+import { createView } from "./view.js";
 
 const TOKEN_KEY = "sctd-token";
 const LANG_KEY = "sctd-lang";
@@ -22,11 +23,14 @@ function storageSet(k, v) {
 }
 
 // Jeton : `?t=` (adresse donnée par l'appli), gardé puis retiré de l'adresse.
+// Vue : `?view=<id>` ouvre cette vue, puis l'appareil garde son propre choix (paramètre retiré aussi).
 const params = new URLSearchParams(location.search);
 let token = params.get("t") || storageGet(TOKEN_KEY);
-if (params.get("t")) {
-	storageSet(TOKEN_KEY, params.get("t"));
+if (params.get("t")) storageSet(TOKEN_KEY, params.get("t"));
+const viewParam = params.get("view");
+if (params.has("t") || params.has("view")) {
 	params.delete("t");
+	params.delete("view");
 	history.replaceState(null, "", location.pathname + (params.toString() ? `?${params}` : ""));
 }
 
@@ -57,6 +61,10 @@ function applyTexts() {
 	$("tab-grid").textContent = t("tabGrid");
 	$("tab-character").textContent = t("tabCharacter");
 	$("tab-ship").textContent = t("tabShip");
+	$("view-add").title = t("addView");
+	$("view-add").setAttribute("aria-label", t("addView"));
+	$("tab-select").setAttribute("aria-label", t("tabs"));
+	renderTabs();
 	$("h-vitals").textContent = t("vitals");
 	$("h-instruments").textContent = t("instruments");
 	$("h-lights").textContent = t("warningLights");
@@ -67,6 +75,7 @@ function applyTexts() {
 	$("about-close").textContent = t("close");
 	renderAbout();
 	$("emotes-hint").textContent = t("emotesHint");
+	myView?.applyTexts();
 }
 
 // ---------- À propos ----------
@@ -119,16 +128,85 @@ $("about-open").addEventListener("click", () => {
 });
 
 // ---------- Onglets ----------
+// Onglets fixes, puis un onglet par vue (« view:<id> ») ; « ＋ » crée une vue. Téléphone : liste déroulante.
 const TABS = ["grid", "character", "ship"];
+const TAB_TEXT = { grid: "tabGrid", character: "tabCharacter", ship: "tabShip" };
+const MAX_VIEWS = 10;
+const ADD = "__add";
+/** Vues connues (nom et id), dans l'ordre des onglets ; `null` tant que l'appli ne les a pas envoyées. */
+let viewTabs = null;
+let currentTab = "grid";
+
+const viewId = (tab) => (tab.startsWith("view:") ? tab.slice(5) : null);
+
+function renderTabs() {
+	const box = $("view-tabs");
+	const list = viewTabs ?? [];
+	// Boutons gardés tant que les vues sont les mêmes (le focus clavier reste sur l'onglet choisi).
+	if ([...box.children].map((b) => b.dataset.id).join("\n") !== list.map((v) => v.id).join("\n")) {
+		const focused = document.activeElement?.closest?.("#view-tabs button")?.dataset.id;
+		box.replaceChildren(
+			...list.map((v) => {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.id = `tab-view-${v.id}`;
+				b.dataset.id = v.id;
+				b.setAttribute("role", "tab");
+				b.setAttribute("aria-controls", "panel-myview");
+				b.addEventListener("click", () => showTab(`view:${v.id}`));
+				return b;
+			}),
+		);
+		if (focused) document.getElementById(`tab-view-${focused}`)?.focus();
+	}
+	list.forEach((v, i) => {
+		const b = box.children[i];
+		b.textContent = v.name || t("viewNameEmpty");
+		b.setAttribute("aria-selected", String(currentTab === `view:${v.id}`));
+	});
+	const shown = viewId(currentTab);
+	if (shown) $("panel-myview").setAttribute("aria-labelledby", `tab-view-${shown}`);
+	$("view-add").hidden = !viewTabs || viewTabs.length >= MAX_VIEWS;
+	const select = $("tab-select");
+	const options = [...TABS.map((tab) => [tab, t(TAB_TEXT[tab])]), ...(viewTabs ?? []).map((v) => [`view:${v.id}`, v.name || t("viewNameEmpty")])];
+	if (viewTabs && viewTabs.length < MAX_VIEWS) options.push([ADD, `＋ ${t("addView")}`]);
+	select.replaceChildren(
+		...options.map(([value, text]) => {
+			const o = document.createElement("option");
+			o.value = value;
+			o.textContent = text;
+			return o;
+		}),
+	);
+	select.value = currentTab;
+}
+
 function showTab(name) {
-	if (!TABS.includes(name)) name = "grid";
+	const id = viewId(name);
+	if (!TABS.includes(name) && id === null) name = "grid";
+	// Vue inconnue (supprimée, lien périmé) : première vue, dès que la liste est connue.
+	if (id !== null && viewTabs && !viewTabs.some((v) => v.id === id)) name = viewTabs[0] ? `view:${viewTabs[0].id}` : "grid";
+	currentTab = name;
 	for (const tab of TABS) {
 		$(`panel-${tab}`).hidden = tab !== name;
 		$(`tab-${tab}`).setAttribute("aria-selected", String(tab === name));
 	}
+	$("panel-myview").hidden = viewId(name) === null;
 	storageSet(TAB_KEY, name);
+	renderTabs();
+	myView?.show(viewId(name));
+	myView?.setVisible(viewId(name) !== null);
 }
 for (const tab of TABS) $(`tab-${tab}`).addEventListener("click", () => showTab(tab));
+
+async function addView() {
+	const id = await myView.addView();
+	if (!id) return renderTabs();
+	showTab(`view:${id}`);
+	myView.editName();
+}
+$("view-add").addEventListener("click", addView);
+$("tab-select").addEventListener("change", (e) => (e.target.value === ADD ? addView() : showTab(e.target.value)));
 
 // ---------- Grille ----------
 function tileButton(index) {
@@ -201,6 +279,7 @@ async function loadEmotes() {
 		const r = await fetch(`/api/v1/actions?lang=${lang}`, { headers: { authorization: `Bearer ${token}` } });
 		if (!r.ok) throw new Error(String(r.status));
 		const { groups, live } = await r.json();
+		myView?.setActions(groups);
 		const emotes = groups.find((g) => g.category === EMOTES)?.actions ?? [];
 		renderEmotes(emotes);
 		// Liste de secours (jeu pas encore joignable) : relue dès que le jeu répond.
@@ -231,6 +310,7 @@ function renderEmotes(emotes) {
 	);
 }
 
+/** Déclenche une action du jeu (émote ou autre) depuis une carte, avec retour ✔ / ⚠. */
 async function triggerEmote(name, el) {
 	try {
 		const r = await fetch(`/api/v1/actions/${encodeURIComponent(name)}/trigger`, { method: "POST", headers: { authorization: `Bearer ${token}` } });
@@ -318,7 +398,9 @@ function connect() {
 		lastState = JSON.parse(e.data);
 		renderCharacter(lastState.character);
 		renderShip(lastState.shipStatus, lastState.ship);
+		myView?.setState(lastState);
 	});
+	source.addEventListener("views", (e) => myView?.setViews(JSON.parse(e.data).views));
 	source.addEventListener("feedback", (e) => {
 		const { index, feedback } = JSON.parse(e.data);
 		const mine = ownPresses.get(index);
@@ -351,8 +433,33 @@ $("lang").addEventListener("click", () => {
 	connect();
 });
 
+// ---------- Ma vue ----------
+const myView = createView({
+	t,
+	token: () => token,
+	lang: () => lang,
+	onViewsChanged(list) {
+		const first = !viewTabs;
+		viewTabs = list.map((v) => ({ id: v.id, name: v.name }));
+		// Première liste : l'onglet demandé (lien ou dernier choix) peut maintenant être vérifié.
+		if (first && viewId(currentTab) !== null) return showTab(currentTab);
+		renderTabs();
+	},
+	onMissing() {
+		if (viewTabs?.[0]) showTab(`view:${viewTabs[0].id}`);
+		else showTab("grid");
+	},
+	card,
+	pressFunction,
+	triggerAction: triggerEmote,
+	showMessage,
+	storage: { get: storageGet, set: storageSet },
+});
+
 applyTexts();
-showTab(storageGet(TAB_KEY) || "grid");
+// Onglet de départ : lien `?view=`, sinon dernier choix de l'appareil (ancien « myview » → première vue).
+const savedTab = storageGet(TAB_KEY);
+showTab(viewParam ? `view:${viewParam}` : savedTab === "myview" ? "view:main" : savedTab || "grid");
 if (!token) {
 	setStatus("off", "");
 	showMessage(t("needToken"));

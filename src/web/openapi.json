@@ -2,7 +2,7 @@
 	"openapi": "3.1.0",
 	"info": {
 		"title": "SC Telemetry Deck API",
-		"version": "1.1.0",
+		"version": "1.2.0",
 		"description": "Local API to read Star Citizen's state and trigger game actions through SC Telemetry Deck. Requires the token shown by the app (Authorization: Bearer …). Dangerous actions (self destruct, eject, opening doors…) are always refused. — FR : API locale pour lire l'état de Star Citizen et déclencher des actions du jeu via SC Telemetry Deck. Demande le jeton affiché par l'appli (Authorization: Bearer …). Les actions dangereuses (autodestruction, éjection, ouverture des portes…) sont toujours refusées.",
 		"license": {
 			"name": "Unofficial community project — projet communautaire non officiel"
@@ -680,6 +680,251 @@
 				}
 			}
 		},
+		"/api/v1/views": {
+			"get": {
+				"operationId": "listViews",
+				"tags": [
+					"View"
+				],
+				"summary": "List “My view” views — lister les vues « Ma vue »",
+				"description": "Every custom view (one tab each, in creation order): a name and named sections (half or full width) holding items (size 1 or 2) rendered by the page from the state event. Until something is saved, a single view “main” whose name and section titles follow the requested language. — FR : toutes les vues personnalisées (un onglet chacune, dans l’ordre de création) : un nom et des sections nommées (demi ou pleine largeur) contenant des cases (taille 1 ou 2), rendues par la page à partir de l’événement state. Tant que rien n’est enregistré, une seule vue « main » dont le nom et les titres suivent la langue demandée.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Language of the default names and section titles — FR : langue des noms et titres par défaut"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The views — les vues",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ViewList"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			},
+			"post": {
+				"operationId": "createView",
+				"tags": [
+					"View"
+				],
+				"summary": "Create a view — créer une vue",
+				"description": "Adds a view (empty when sections is omitted) with an id chosen by the app, saves it in view.json next to settings.json and sends the views to every connected page (views event). Name trimmed to 24 characters, empty → “View” / « Vue ». 10 views at most (409 too_many_views). — FR : ajoute une vue (vide si sections est absent) avec un identifiant choisi par l’appli, l’enregistre dans view.json à côté de settings.json et envoie les vues à toutes les pages connectées (événement views). Nom coupé à 24 caractères, vide → « Vue » / “View”. 10 vues au plus (409 too_many_views).",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Language of the default names and section titles — FR : langue des noms et titres par défaut"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ViewInput"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Created view — vue créée",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NamedView"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid view — vue invalide",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"409": {
+						"description": "Already 10 views — déjà 10 vues",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/views/{id}": {
+			"put": {
+				"operationId": "saveView",
+				"tags": [
+					"View"
+				],
+				"summary": "Save a view — enregistrer une vue",
+				"description": "Replaces the name and sections of this view only (other views are untouched, so two screens can edit two views at once) and sends the views to every connected page. Titles trimmed to 40 characters, an empty title becomes “Section”. 400 invalid_view if anything is invalid (unknown kind or ref, duplicate ids, limits, dangerous action): nothing is saved. 404 unknown_view if the view was deleted. — FR : remplace le nom et les sections de cette vue seulement (les autres ne bougent pas : deux écrans peuvent modifier deux vues en même temps) et envoie les vues à toutes les pages connectées. Titres coupés à 40 caractères, titre vide → « Section ». 400 invalid_view si quoi que ce soit est invalide (type ou ref inconnus, identifiants en double, limites, action dangereuse) : rien n’est enregistré. 404 unknown_view si la vue a été supprimée.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "^[A-Za-z0-9_-]{1,32}$"
+						},
+						"description": "View id — FR : identifiant de la vue"
+					},
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Language of the default names and section titles — FR : langue des noms et titres par défaut"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ViewInput"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Saved view — vue enregistrée",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NamedView"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid view — vue invalide",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "Unknown view — vue inconnue",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "deleteView",
+				"tags": [
+					"View"
+				],
+				"summary": "Delete a view — supprimer une vue",
+				"description": "Deletes the view and sends the views to every connected page. The last view cannot be deleted (409 last_view). — FR : supprime la vue et envoie les vues à toutes les pages connectées. La dernière vue ne peut pas être supprimée (409 last_view).",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "^[A-Za-z0-9_-]{1,32}$"
+						},
+						"description": "View id — FR : identifiant de la vue"
+					},
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Language of the default names and section titles — FR : langue des noms et titres par défaut"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Deleted — supprimée"
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					},
+					"404": {
+						"description": "Unknown view — vue inconnue",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "Last view — dernière vue",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/api/v1/events": {
 			"get": {
 				"operationId": "streamEvents",
@@ -687,7 +932,7 @@
 					"Realtime"
 				],
 				"summary": "Real-time events (SSE) — événements temps réel (SSE)",
-				"description": "Server-Sent Events stream. Events: status (same object as /status, when it changes), tile {index, image} (only tiles whose image changed), state {vitals, ship, character, shipStatus} (at most 4 per second, only when changed), feedback {index, feedback, detail?} after a tile press. A ': ping' comment every 15 s. Browsers' EventSource cannot send headers: pass the token as ?t=. — FR : flux Server-Sent Events. Événements : status (même objet que /status, quand il change), tile {index, image} (seulement les tuiles dont l'image change), state {vitals, ship, character, shipStatus} (au plus 4 par seconde, seulement si changé), feedback {index, feedback, detail?} après un appui de tuile. Un commentaire « : ping » toutes les 15 s. EventSource ne peut pas envoyer d'en-tête : passer le jeton en ?t=.",
+				"description": "Server-Sent Events stream. Events: status (same object as /status, when it changes), tile {index, image} (only tiles whose image changed), state {vitals, ship, character, shipStatus} (at most 4 per second, only when changed), feedback {index, feedback, detail?} after a tile press, views (same object as GET /views) on connection and whenever a view is created, saved or deleted. A ': ping' comment every 15 s. Browsers' EventSource cannot send headers: pass the token as ?t=. — FR : flux Server-Sent Events. Événements : status (même objet que /status, quand il change), tile {index, image} (seulement les tuiles dont l'image change), state {vitals, ship, character, shipStatus} (au plus 4 par seconde, seulement si changé), feedback {index, feedback, detail?} après un appui de tuile, views (même objet que GET /views) à la connexion et à chaque création, enregistrement ou suppression d’une vue. Un commentaire « : ping » toutes les 15 s. EventSource ne peut pas envoyer d'en-tête : passer le jeton en ?t=.",
 				"parameters": [
 					{
 						"name": "lang",
@@ -1452,6 +1697,137 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/Annunciator"
+						}
+					}
+				}
+			},
+			"ViewItem": {
+				"type": "object",
+				"required": [
+					"id",
+					"kind",
+					"size"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"id": {
+						"type": "string",
+						"pattern": "^[A-Za-z0-9_-]{1,32}$"
+					},
+					"kind": {
+						"enum": [
+							"vital",
+							"instrument",
+							"annunciators",
+							"ship_info",
+							"character_info",
+							"ship_function",
+							"action"
+						]
+					},
+					"ref": {
+						"type": "string",
+						"description": "vital: a vital id; instrument: shields, hull, hydrogen, quantum, speed, radar_altitude, heading; ship_info: name, master_mode, landed; character_info: position, role, seat; ship_function: a ship function id; action: a game action name (dangerous actions refused); none for annunciators — FR : vital : une constante ; instrument : shields, hull, hydrogen, quantum, speed, radar_altitude, heading ; ship_info : name, master_mode, landed ; character_info : position, role, seat ; ship_function : une fonction vaisseau ; action : nom d’action du jeu (actions dangereuses refusées) ; rien pour annunciators"
+					},
+					"size": {
+						"enum": [
+							1,
+							2
+						]
+					}
+				}
+			},
+			"ViewSection": {
+				"type": "object",
+				"required": [
+					"id",
+					"title",
+					"width",
+					"items"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"id": {
+						"type": "string",
+						"pattern": "^[A-Za-z0-9_-]{1,32}$"
+					},
+					"title": {
+						"type": "string",
+						"maxLength": 40
+					},
+					"width": {
+						"enum": [
+							"half",
+							"full"
+						]
+					},
+					"items": {
+						"type": "array",
+						"maxItems": 40,
+						"items": {
+							"$ref": "#/components/schemas/ViewItem"
+						}
+					}
+				}
+			},
+			"ViewInput": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 24,
+						"description": "Tab name — FR : nom de l’onglet"
+					},
+					"sections": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"$ref": "#/components/schemas/ViewSection"
+						}
+					}
+				}
+			},
+			"NamedView": {
+				"type": "object",
+				"required": [
+					"id",
+					"name",
+					"sections"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"id": {
+						"type": "string",
+						"pattern": "^[A-Za-z0-9_-]{1,32}$"
+					},
+					"name": {
+						"type": "string",
+						"maxLength": 24,
+						"description": "Tab name — FR : nom de l’onglet"
+					},
+					"sections": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"$ref": "#/components/schemas/ViewSection"
+						}
+					}
+				}
+			},
+			"ViewList": {
+				"type": "object",
+				"required": [
+					"views"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"views": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 10,
+						"items": {
+							"$ref": "#/components/schemas/NamedView"
 						}
 					}
 				}

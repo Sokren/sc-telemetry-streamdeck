@@ -17,11 +17,13 @@ export type EventHubDeps = {
 	morse: MorseControl;
 	layout: () => readonly Tile[];
 	status: () => unknown;
+	/** Vues « Ma vue » dans la langue du client (`{ views }`, envoyées à la connexion et quand elles changent). */
+	views?: (lang: Lang) => unknown;
 	/** Intervalle minimal entre deux envois (défaut 250 ms). */
 	intervalMs?: number;
 };
 
-type Client = { res: ServerResponse; lang: Lang; status?: string; tiles: string[]; state?: string };
+type Client = { res: ServerResponse; lang: Lang; status?: string; tiles: string[]; state?: string; views?: string };
 
 const PING_MS = 15_000;
 
@@ -100,6 +102,13 @@ export class EventHub {
 		if (status !== c.status) {
 			c.status = status;
 			this.#writeRaw(c, "status", status);
+		}
+		if (this.deps.views) {
+			const views = JSON.stringify(this.deps.views(c.lang));
+			if (views !== c.views) {
+				c.views = views;
+				this.#writeRaw(c, "views", views);
+			}
 		}
 		const ctx = { hub: this.deps.hub, morse: this.deps.morse, lang: c.lang };
 		this.deps.layout().forEach((tile, index) => {

@@ -53,6 +53,7 @@ export async function startServer(o: ServerOptions): Promise<RunningServer> {
 		source: new ActionSource(game, () => readSnapshot(snapshotFile)),
 		openapi: JSON.parse(fs.readFileSync(o.openapiFile, "utf-8")),
 		swaggerDir: o.swaggerDir,
+		viewFile: path.join(o.settingsDir, "view.json"),
 		fallback: staticFiles(o.staticDir),
 	});
 	const server = http.createServer(app.handler);

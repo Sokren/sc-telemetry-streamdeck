@@ -381,3 +381,314 @@ dialog button {
 	font: inherit;
 	cursor: pointer;
 }
+
+/* ---------- Ma vue ---------- */
+nav .lock.open {
+	border-color: var(--warn);
+	color: var(--warn);
+}
+.vsections {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	align-items: start;
+	max-width: 1400px;
+}
+.vsec {
+	background: var(--panel);
+	border: 1px solid transparent;
+	border-radius: 12px;
+	padding: 10px 14px 14px;
+	min-width: 0;
+}
+.vsec.full {
+	grid-column: 1 / -1;
+}
+.editing .vsec {
+	border: 1px dashed #4a5563;
+}
+.vhead {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 32px;
+	margin-bottom: 8px;
+}
+.vtitle {
+	margin: 0;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+.vtitle-input {
+	flex: 1;
+	min-width: 0;
+	background: #0a0d11;
+	color: var(--text);
+	border: 1px solid #2a3038;
+	border-radius: 6px;
+	padding: 5px 8px;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+}
+.vsctl,
+.vctl {
+	display: flex;
+	gap: 4px;
+	margin-left: auto;
+}
+.vsctl button,
+.vctl button,
+.vadd,
+.vnewsec,
+.vmenu button {
+	background: #1b2129;
+	color: var(--text);
+	border: 1px solid #2a3038;
+	border-radius: 6px;
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+.vsctl button {
+	padding: 4px 8px;
+}
+.vhandle {
+	cursor: grab;
+	touch-action: none;
+}
+.vgrid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 10px;
+	min-height: 40px;
+}
+.vsec.half .vgrid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.vitem {
+	position: relative;
+	min-width: 0;
+}
+.vitem.s2 {
+	grid-column: span 2;
+}
+.vcontent,
+.vcontent > .card {
+	height: 100%;
+	width: 100%;
+}
+.vcontent > .card {
+	background: #1b2129;
+	min-height: 84px;
+}
+.vcontent > .card.emote {
+	min-height: 84px;
+}
+.vcontent .lights {
+	margin-top: 8px;
+	gap: 6px;
+}
+.editing .vitem {
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+}
+.editing .vitem .card {
+	outline: 1px dashed #4a5563;
+	pointer-events: none;
+}
+.vctl {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	z-index: 1;
+}
+.vctl button {
+	padding: 1px 7px;
+	font-size: 12px;
+}
+.vadd {
+	display: block;
+	width: 100%;
+	margin-top: 10px;
+	padding: 8px;
+	border-style: dashed;
+	color: var(--muted);
+	background: transparent;
+}
+.vnewsec {
+	display: block;
+	width: 100%;
+	max-width: 1400px;
+	margin-top: 16px;
+	padding: 12px;
+	border: 1px dashed var(--warn);
+	color: var(--warn);
+	background: transparent;
+}
+.vhint {
+	margin-top: 14px;
+	max-width: 60em;
+}
+.vph {
+	border: 2px dashed var(--warn);
+	border-radius: 10px;
+	min-height: 60px;
+}
+.vph.s2 {
+	grid-column: span 2;
+}
+.vph.full {
+	grid-column: 1 / -1;
+}
+.vghost {
+	position: fixed;
+	z-index: 50;
+	pointer-events: none;
+	opacity: 0.85;
+	list-style: none;
+}
+.vmenu {
+	position: absolute;
+	z-index: 40;
+	background: #232b35;
+	border: 1px solid #3a4552;
+	border-radius: 10px;
+	padding: 10px;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+.vmtabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+.vmtabs button {
+	padding: 5px 10px;
+	background: transparent;
+	border-color: transparent;
+	color: var(--muted);
+}
+.vmtabs button.on {
+	background: #38434f;
+	color: var(--text);
+}
+.vmsearch {
+	width: 100%;
+	box-sizing: border-box;
+	background: #1b2129;
+	color: var(--text);
+	border: 1px solid #2a3038;
+	border-radius: 6px;
+	padding: 7px 10px;
+	font: inherit;
+	font-size: 14px;
+	margin-bottom: 8px;
+}
+.vmlist {
+	max-height: min(50vh, 360px);
+	overflow-y: auto;
+}
+.vmenu .vmi {
+	display: flex;
+	width: 100%;
+	justify-content: space-between;
+	gap: 12px;
+	align-items: center;
+	padding: 7px 8px;
+	background: transparent;
+	border-color: transparent;
+	text-align: left;
+	font-size: 14px;
+}
+.vmenu .vmi:hover,
+.vmenu .vmi:focus-visible {
+	background: #2f3944;
+}
+.vmi small {
+	color: var(--muted);
+	font-size: 12px;
+	white-space: nowrap;
+}
+@media (max-width: 999px) {
+	.vsections {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+@media (max-width: 599px) {
+	.vgrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+#myview:not(.editing) .vgrid:empty {
+	display: none;
+}
+
+/* ---------- Onglets de vues, « ＋ », liste sur téléphone ---------- */
+.view-tabs {
+	display: contents;
+}
+.tabs .tab-add {
+	color: var(--muted);
+	font-size: 18px;
+	line-height: 1;
+	padding: 6px 12px;
+}
+.tabs .tab-add:hover {
+	color: var(--text);
+}
+.tab-select {
+	display: none;
+}
+.vviewhead {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	max-width: 1400px;
+	margin-bottom: 14px;
+}
+.vname-input {
+	flex: 0 1 320px;
+	min-width: 0;
+	background: #0a0d11;
+	color: var(--text);
+	border: 1px solid #2a3038;
+	border-radius: 6px;
+	padding: 6px 10px;
+	font: inherit;
+	font-size: 16px;
+	font-weight: 600;
+}
+.vdelview {
+	background: transparent;
+	color: var(--warn);
+	border: 1px solid var(--warn);
+	border-radius: 6px;
+	padding: 5px 12px;
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+@media (max-width: 599px) {
+	.tabs {
+		padding-bottom: 10px;
+	}
+	.tabs > button,
+	.view-tabs {
+		display: none;
+	}
+	.tab-select {
+		display: block;
+		flex: 1;
+		background: #0a0d11;
+		color: var(--text);
+		border: 1px solid #2a3038;
+		border-radius: 6px;
+		padding: 8px 10px;
+		font: inherit;
+		font-size: 15px;
+	}
+}

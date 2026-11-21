@@ -42,6 +42,7 @@ export async function startTestServer(opts: { game?: FakeHandlers | null; extra?
 		game,
 		hub,
 		source: new ActionSource(game, () => readSnapshot(SNAPSHOT)),
+		viewFile: path.join(dir, "view.json"),
 		...opts.extra,
 	};
 	const app = createApp(deps);

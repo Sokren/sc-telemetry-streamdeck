@@ -130,7 +130,7 @@ npm run start:web        # opens the page in your browser (add -- --no-open to s
 npm run build:exe        # builds dist\sc-telemetry-web.exe (single file, Node SEA)
 ```
 
-- Page: `http://127.0.0.1:8743/` — the app opens it with the access token included. Three tabs: **Grid** (buttons), **Character** (position, crew role, all 13 vitals and the 34 emotes, clickable) and **Ship** (instruments, warning lights and the 17 functions, clickable).
+- Page: `http://127.0.0.1:8743/` — the app opens it with the access token included. Tabs: **Grid** (buttons), **Character** (position, crew role, all 13 vitals and the 34 emotes, clickable), **Ship** (instruments, warning lights and the 17 functions, clickable) and **your views** (first one: **My view**; **＋** adds more, up to 10): your own layouts, with named sections (half or full width) and the items you pick from an **Add** menu (vitals, instruments, warning lights, ship functions, actions, emotes), moved by drag and drop (mouse or touch). Unlock a view with the padlock to edit, rename or delete it, lock it to use it. Views are saved in the app (`view.json` next to `settings.json`) and kept when it restarts: one view per screen (PC, tablet, phone…), and a link ending in `?view=<id>` opens a given view directly (the device remembers it; the tabs, or a list on a phone, switch views).
 - Swagger UI: `http://127.0.0.1:8743/api/docs` — contract: `/api/v1/openapi.json`.
 - Every API call needs the token (`Authorization: Bearer …`), stored in `%APPDATA%\SC Telemetry Deck\settings.json`.
 - This preview listens on **this PC only** (`127.0.0.1`). Tablet / phone access (QR code) and an editable grid come in the next steps.

@@ -18,7 +18,9 @@ import { morseRoutes } from "./routes/morse.js";
 import { panelRoutes } from "./routes/panels.js";
 import { shipRoutes } from "./routes/ship.js";
 import { telemetryRoutes } from "./routes/telemetry.js";
+import { viewsRoutes } from "./routes/view.js";
 import { vitalRoutes } from "./routes/vitals.js";
+import { ViewStore } from "./view.js";
 
 /** Ce dont l'appli a besoin ; complété au fil des étapes. */
 export type AppDeps = {
@@ -37,6 +39,8 @@ export type AppDeps = {
 	swaggerDir?: string;
 	/** Contrat OpenAPI (par défaut : `openapi.json` à côté de ce module). */
 	openapi?: unknown;
+	/** Fichier des vues « Ma vue » (`view.json`) ; absent → vues gardées en mémoire seulement. */
+	viewFile?: string;
 	/** Fichiers statiques de la page (étape suivante). */
 	fallback?: (req: IncomingMessage, res: ServerResponse) => boolean;
 };
@@ -110,7 +114,10 @@ export function createApp(deps: AppDeps): App {
 			actions: capability.value,
 		};
 	};
-	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status });
+	const views = new ViewStore(deps.viewFile);
+	const events = new EventHub({ hub: deps.hub, game: deps.game, morse, layout, status, views: (lang) => ({ views: views.list(lang) }) });
+	// Vue enregistrée (depuis n'importe quel appareil) → renvoyée à toutes les pages connectées.
+	const stopView = views.onChange(() => events.refresh());
 	// Changement de capacité (jeu relancé dans une autre version) → état renvoyé aux pages connectées.
 	const stopCapability = capability.onChange(() => events.refresh());
 	capability.start();
@@ -135,6 +142,7 @@ export function createApp(deps: AppDeps): App {
 		...shipRoutes(deps),
 		...panelRoutes(deps),
 		...morseRoutes({ morse }),
+		...viewsRoutes({ views }),
 		...layoutRoutes({ hub: deps.hub, game: deps.game, morse, layout, onFeedback: (i, f) => events.feedback(i, f) }),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },
 		{
@@ -160,6 +168,7 @@ export function createApp(deps: AppDeps): App {
 		handler: createHandler(routes, () => deps.settings.token, deps.fallback),
 		close: () => {
 			stopCapability();
+			stopView();
 			capability.stop();
 			events.close();
 			unsubscribe();
