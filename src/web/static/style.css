@@ -122,3 +122,173 @@ main {
 	background: rgba(17, 20, 24, 0.6);
 	opacity: 1;
 }
+
+/* ---------- Onglets ---------- */
+.tabs {
+	display: flex;
+	gap: 6px;
+	padding: 10px 16px 0;
+	background: var(--panel);
+	border-bottom: 1px solid #2a3038;
+}
+.tabs button {
+	background: transparent;
+	color: var(--muted);
+	border: 0;
+	border-bottom: 2px solid transparent;
+	padding: 8px 12px;
+	font: inherit;
+	font-size: 15px;
+	cursor: pointer;
+}
+.tabs button[aria-selected="true"] {
+	color: var(--text);
+	border-bottom-color: var(--ok);
+}
+h2 {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--muted);
+	margin: 18px 0 8px;
+}
+.subhead {
+	margin: 0 0 4px;
+	font-size: 16px;
+}
+.hint {
+	margin: -4px 0 8px;
+	color: var(--muted);
+	font-size: 13px;
+}
+
+/* ---------- Cartes : constantes, instruments, fonctions ---------- */
+.cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 10px;
+	max-width: 1100px;
+}
+.card {
+	position: relative;
+	overflow: hidden;
+	background: var(--panel);
+	border: 1px solid #1d232a;
+	border-radius: 12px;
+	padding: 10px 12px;
+	color: var(--text);
+	text-align: left;
+	font: inherit;
+}
+.card .label {
+	font-size: 13px;
+	color: var(--muted);
+}
+.card .value {
+	font-size: 22px;
+	font-weight: 600;
+	margin: 2px 0 6px;
+}
+.card .bar {
+	height: 6px;
+	border-radius: 3px;
+	background: #2a3038;
+}
+.card .bar i {
+	display: block;
+	height: 100%;
+	border-radius: 3px;
+	background: var(--muted);
+}
+.card.level-ok .bar i {
+	background: var(--ok);
+}
+.card.level-warn .bar i {
+	background: var(--warn);
+}
+.card.level-warn .value {
+	color: var(--warn);
+}
+.card.level-bad .bar i {
+	background: var(--bad);
+}
+.card.level-bad .value {
+	color: var(--bad);
+}
+.function {
+	cursor: pointer;
+	touch-action: manipulation;
+}
+.function:active {
+	transform: scale(0.97);
+}
+.function[data-state="on"] .value {
+	color: #5dcaa5;
+}
+.function[data-state="off"] .value {
+	color: #888780;
+}
+.function[data-state^="moving"] .value {
+	color: var(--warn);
+}
+.function[data-state="unknown"] .value,
+.function[data-state="unavailable"] .value {
+	color: #5f5e5a;
+}
+.card .flash {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 32px;
+	font-weight: 700;
+	opacity: 0;
+	transition: opacity 0.3s;
+	pointer-events: none;
+}
+.card .flash.ok {
+	color: var(--ok);
+	background: rgba(21, 26, 32, 0.7);
+	opacity: 1;
+}
+.card .flash.alert {
+	color: var(--warn);
+	background: rgba(21, 26, 32, 0.7);
+	opacity: 1;
+}
+
+/* ---------- Voyants ---------- */
+.lights {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	max-width: 1100px;
+}
+.light {
+	font-size: 13px;
+	padding: 5px 10px;
+	border-radius: 6px;
+	border: 1px solid #2a3038;
+	color: #5f5e5a;
+}
+.light-nominal {
+	color: #5dcaa5;
+	border-color: #0f6e56;
+}
+.light-minor {
+	color: var(--warn);
+	border-color: #854f0b;
+}
+.light-major {
+	color: #fff;
+	background: #a32d2d;
+	border-color: var(--bad);
+}
+.light.flashing {
+	animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+	to {
+		visibility: hidden;
+	}
+}

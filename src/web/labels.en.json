@@ -1,0 +1,26 @@
+{
+	"locomotion": { "on_foot": "On foot", "eva": "EVA", "seated": "Seated", "unknown": "—" },
+	"crewRole": { "pilot": "Pilot", "gunner": "Gunner", "crew": "Crew", "none": "—" },
+	"masterMode": { "nav": "NAV", "scm": "SCM", "stealth": "Stealth" },
+	"instruments": {
+		"shields": "Shields",
+		"hull": "Hull",
+		"hydrogen": "Hydrogen",
+		"quantum": "Quantum",
+		"speed": "Speed",
+		"radar_altitude": "Radar altitude",
+		"heading": "Heading"
+	},
+	"annunciators": {
+		"pwr": "Power",
+		"wpn": "Weapons",
+		"thr": "Thrusters",
+		"shld": "Shields",
+		"cool": "Cooling",
+		"qdrv": "Quantum",
+		"radr": "Radar",
+		"prox": "Proximity",
+		"hit": "Hit",
+		"misl": "Missile"
+	}
+}

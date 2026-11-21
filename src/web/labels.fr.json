@@ -1,0 +1,26 @@
+{
+	"locomotion": { "on_foot": "À pied", "eva": "EVA", "seated": "Assis", "unknown": "—" },
+	"crewRole": { "pilot": "Pilote", "gunner": "Tireur", "crew": "Équipage", "none": "—" },
+	"masterMode": { "nav": "NAV", "scm": "SCM", "stealth": "Furtif" },
+	"instruments": {
+		"shields": "Boucliers",
+		"hull": "Coque",
+		"hydrogen": "Hydrogène",
+		"quantum": "Quantum",
+		"speed": "Vitesse",
+		"radar_altitude": "Altitude radar",
+		"heading": "Cap"
+	},
+	"annunciators": {
+		"pwr": "Puissance",
+		"wpn": "Armes",
+		"thr": "Propulseurs",
+		"shld": "Boucliers",
+		"cool": "Refroidissement",
+		"qdrv": "Quantum",
+		"radr": "Radar",
+		"prox": "Proximité",
+		"hit": "Impact",
+		"misl": "Missile"
+	}
+}

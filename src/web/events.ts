@@ -6,6 +6,7 @@ import { SHIP_FUNCTION_IDS } from "../ship/functions.js";
 import type { TelemetryHub } from "../telemetry/hub.js";
 import type { Tile } from "./layout.js";
 import type { MorseControl } from "./morse-control.js";
+import { characterOf, shipStatusOf } from "./panels.js";
 import { shipStateOf } from "./routes/ship.js";
 import { vitalOf } from "./routes/vitals.js";
 import { renderTile, type TileFeedback } from "./tiles.js";
@@ -107,6 +108,8 @@ export class EventHub {
 		const state = JSON.stringify({
 			vitals: DISPLAY_VALUES.map((id) => vitalOf(id, actor, c.lang)),
 			ship: SHIP_FUNCTION_IDS.map((id) => shipStateOf(id, this.deps.hub, c.lang)),
+			character: characterOf(actor, c.lang),
+			shipStatus: shipStatusOf(this.deps.hub.section("vehicle"), actor, c.lang),
 		});
 		if (state !== c.state) {
 			c.state = state;

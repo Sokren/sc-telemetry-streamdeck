@@ -14,6 +14,7 @@ import { DEFAULT_LAYOUT } from "./layout.js";
 import { actionRoutes } from "./routes/actions.js";
 import { layoutRoutes } from "./routes/layout.js";
 import { morseRoutes } from "./routes/morse.js";
+import { panelRoutes } from "./routes/panels.js";
 import { shipRoutes } from "./routes/ship.js";
 import { telemetryRoutes } from "./routes/telemetry.js";
 import { vitalRoutes } from "./routes/vitals.js";
@@ -124,6 +125,7 @@ export function createApp(deps: AppDeps): App {
 		...vitalRoutes(deps),
 		...telemetryRoutes(deps),
 		...shipRoutes(deps),
+		...panelRoutes(deps),
 		...morseRoutes({ morse }),
 		...layoutRoutes({ hub: deps.hub, game: deps.game, morse, layout, onFeedback: (i, f) => events.feedback(i, f) }),
 		{ method: "GET", path: "/api/v1/openapi.json", public: true, handle: async () => ({ status: 200, json: openapi }) },

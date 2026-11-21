@@ -16,9 +16,34 @@
 				<a id="api" href="/api/docs" target="_blank" rel="noopener"></a>
 			</nav>
 		</header>
+		<div class="tabs" role="tablist">
+			<button type="button" role="tab" data-tab="grid" id="tab-grid"></button>
+			<button type="button" role="tab" data-tab="character" id="tab-character"></button>
+			<button type="button" role="tab" data-tab="ship" id="tab-ship"></button>
+		</div>
 		<main>
 			<p id="message" hidden></p>
-			<div id="grid" class="grid"></div>
+
+			<section id="panel-grid" role="tabpanel">
+				<div id="grid" class="grid"></div>
+			</section>
+
+			<section id="panel-character" role="tabpanel" hidden>
+				<p id="char-head" class="subhead"></p>
+				<h2 id="h-vitals"></h2>
+				<div id="char-vitals" class="cards"></div>
+			</section>
+
+			<section id="panel-ship" role="tabpanel" hidden>
+				<p id="ship-head" class="subhead"></p>
+				<h2 id="h-instruments"></h2>
+				<div id="ship-instruments" class="cards"></div>
+				<h2 id="h-lights"></h2>
+				<div id="ship-lights" class="lights"></div>
+				<h2 id="h-functions"></h2>
+				<p id="functions-hint" class="hint"></p>
+				<div id="ship-functions" class="cards functions"></div>
+			</section>
 		</main>
 		<script type="module" src="app.js"></script>
 	</body>

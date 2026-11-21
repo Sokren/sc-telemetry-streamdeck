@@ -1,9 +1,10 @@
-// Page de SC Telemetry Deck : grille de tuiles, état en direct (Server-Sent Events), appuis.
-// Utilise uniquement l'API publique v1 (la même que n'importe quel autre logiciel).
+// Page de SC Telemetry Deck : grille de tuiles, onglets Personnage et Vaisseau, état en direct
+// (Server-Sent Events), appuis. Utilise uniquement l'API publique v1 (la même que n'importe quel autre logiciel).
 import { I18N } from "./i18n.js";
 
 const TOKEN_KEY = "sctd-token";
 const LANG_KEY = "sctd-lang";
+const TAB_KEY = "sctd-tab";
 
 function storageGet(k) {
 	try {
@@ -30,11 +31,13 @@ if (params.get("t")) {
 }
 
 let lang = storageGet(LANG_KEY) || (navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en");
+if (!(lang in I18N)) lang = "en";
 const t = (key) => I18N[lang][key];
 
 const $ = (id) => document.getElementById(id);
 const grid = $("grid");
 let source;
+let lastState;
 
 function setStatus(kind, text) {
 	$("status").className = `status ${kind}`;
@@ -51,8 +54,29 @@ function applyTexts() {
 	$("title").textContent = t("title");
 	$("lang").textContent = t("language");
 	$("api").textContent = t("api");
+	$("tab-grid").textContent = t("tabGrid");
+	$("tab-character").textContent = t("tabCharacter");
+	$("tab-ship").textContent = t("tabShip");
+	$("h-vitals").textContent = t("vitals");
+	$("h-instruments").textContent = t("instruments");
+	$("h-lights").textContent = t("warningLights");
+	$("h-functions").textContent = t("functions");
+	$("functions-hint").textContent = t("functionsHint");
 }
 
+// ---------- Onglets ----------
+const TABS = ["grid", "character", "ship"];
+function showTab(name) {
+	if (!TABS.includes(name)) name = "grid";
+	for (const tab of TABS) {
+		$(`panel-${tab}`).hidden = tab !== name;
+		$(`tab-${tab}`).setAttribute("aria-selected", String(tab === name));
+	}
+	storageSet(TAB_KEY, name);
+}
+for (const tab of TABS) $(`tab-${tab}`).addEventListener("click", () => showTab(tab));
+
+// ---------- Grille ----------
 function tileButton(index) {
 	let el = grid.children[index];
 	while (!el) {
@@ -68,8 +92,8 @@ function tileButton(index) {
 	return el;
 }
 
-function flash(index, kind) {
-	const f = tileButton(index).querySelector(".flash");
+function flashOn(el, kind) {
+	const f = el.querySelector(".flash");
 	f.textContent = kind === "ok" ? "✔" : "⚠";
 	f.className = `flash ${kind}`;
 	setTimeout(() => (f.className = "flash"), 600);
@@ -85,12 +109,85 @@ async function press(index) {
 		const r = await fetch(`/api/v1/layout/tiles/${index}/press`, { method: "POST", headers: { authorization: `Bearer ${token}` } });
 		if (r.status === 401) return showMessage(t("badToken"));
 		const body = await r.json();
-		flash(index, body.feedback === "ok" ? "ok" : "alert");
+		flashOn(tileButton(index), body.feedback === "ok" ? "ok" : "alert");
 	} catch {
-		flash(index, "alert");
+		flashOn(tileButton(index), "alert");
 	}
 }
 
+// ---------- Cartes (constantes, instruments) ----------
+function card(item) {
+	const el = document.createElement("div");
+	el.className = `card level-${item.level ?? "none"}`;
+	const value = item.text === "—" || !item.unit ? item.text : `${item.text} ${item.unit}`;
+	el.innerHTML = '<div class="label"></div><div class="value"></div>';
+	el.querySelector(".label").textContent = item.label;
+	el.querySelector(".value").textContent = value;
+	if (typeof item.percent === "number") {
+		const bar = document.createElement("div");
+		bar.className = "bar";
+		bar.innerHTML = "<i></i>";
+		bar.firstChild.style.width = `${Math.round(item.percent)}%`;
+		el.append(bar);
+	}
+	return el;
+}
+
+function renderCharacter(c) {
+	$("char-head").textContent = c.available ? [c.locomotionLabel, c.crewRoleLabel].filter((x) => x && x !== "—").join(" · ") : t("notSpawned");
+	$("char-vitals").replaceChildren(...c.vitals.map(card));
+}
+
+// ---------- Vaisseau ----------
+async function pressFunction(id, el) {
+	try {
+		const r = await fetch(`/api/v1/ship/functions/${id}/press?lang=${lang}`, {
+			method: "POST",
+			headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+			body: JSON.stringify({ mode: "toggle" }),
+		});
+		if (r.status === 401) return showMessage(t("badToken"));
+		flashOn(el, r.status === 200 ? "ok" : "alert");
+	} catch {
+		flashOn(el, "alert");
+	}
+}
+
+function renderShip(status, functions) {
+	if (status.available) {
+		const parts = [status.name, status.landed === null ? null : status.landed ? t("landed") : t("flying"), status.masterModeLabel];
+		$("ship-head").textContent = parts.filter((x) => x && x !== "—").join(" · ");
+	} else $("ship-head").textContent = t("notInShip");
+	$("ship-instruments").replaceChildren(...status.instruments.map(card));
+	$("ship-lights").replaceChildren(
+		...status.annunciators.map((a) => {
+			const el = document.createElement("span");
+			el.className = `light light-${a.state}${a.flashing ? " flashing" : ""}`;
+			el.textContent = a.label;
+			return el;
+		}),
+	);
+	// Les cartes de fonction sont gardées d'un rendu à l'autre (clic et ✔ / ⚠ stables).
+	const box = $("ship-functions");
+	functions.forEach((f, i) => {
+		let el = box.children[i];
+		if (!el || el.dataset.id !== f.id) {
+			el = document.createElement("button");
+			el.type = "button";
+			el.className = "card function";
+			el.dataset.id = f.id;
+			el.innerHTML = '<div class="label"></div><div class="value"></div><span class="flash"></span>';
+			el.addEventListener("click", () => pressFunction(f.id, el));
+			if (box.children[i]) box.children[i].replaceWith(el);
+			else box.append(el);
+		}
+		el.querySelector(".label").textContent = f.label;
+		el.querySelector(".value").textContent = f.word;
+		el.dataset.state = f.state;
+	});
+}
+
+// ---------- Temps réel ----------
 function connect() {
 	source?.close();
 	setStatus("", t("connecting"));
@@ -104,6 +201,11 @@ function connect() {
 		const img = tileButton(index).querySelector("img");
 		if (img.src !== image) img.src = image;
 	});
+	source.addEventListener("state", (e) => {
+		lastState = JSON.parse(e.data);
+		renderCharacter(lastState.character);
+		renderShip(lastState.shipStatus, lastState.ship);
+	});
 	source.addEventListener("feedback", (e) => {
 		const { index, feedback } = JSON.parse(e.data);
 		const mine = ownPresses.get(index);
@@ -111,7 +213,7 @@ function connect() {
 			ownPresses.delete(index);
 			return;
 		}
-		flash(index, feedback === "ok" ? "ok" : "alert");
+		flashOn(tileButton(index), feedback === "ok" ? "ok" : "alert");
 	});
 	source.onerror = async () => {
 		setStatus("off", t("offline"));
@@ -132,10 +234,12 @@ $("lang").addEventListener("click", () => {
 	storageSet(LANG_KEY, lang);
 	applyTexts();
 	grid.replaceChildren();
+	$("ship-functions").replaceChildren();
 	connect();
 });
 
 applyTexts();
+showTab(storageGet(TAB_KEY) || "grid");
 if (!token) {
 	setStatus("off", "");
 	showMessage(t("needToken"));

@@ -687,7 +687,7 @@
 					"Realtime"
 				],
 				"summary": "Real-time events (SSE) — événements temps réel (SSE)",
-				"description": "Server-Sent Events stream. Events: status (same object as /status, when it changes), tile {index, image} (only tiles whose image changed), state {vitals, ship} (at most 4 per second, only when changed), feedback {index, feedback, detail?} after a tile press. A ': ping' comment every 15 s. Browsers' EventSource cannot send headers: pass the token as ?t=. — FR : flux Server-Sent Events. Événements : status (même objet que /status, quand il change), tile {index, image} (seulement les tuiles dont l'image change), state {vitals, ship} (au plus 4 par seconde, seulement si changé), feedback {index, feedback, detail?} après un appui de tuile. Un commentaire « : ping » toutes les 15 s. EventSource ne peut pas envoyer d'en-tête : passer le jeton en ?t=.",
+				"description": "Server-Sent Events stream. Events: status (same object as /status, when it changes), tile {index, image} (only tiles whose image changed), state {vitals, ship, character, shipStatus} (at most 4 per second, only when changed), feedback {index, feedback, detail?} after a tile press. A ': ping' comment every 15 s. Browsers' EventSource cannot send headers: pass the token as ?t=. — FR : flux Server-Sent Events. Événements : status (même objet que /status, quand il change), tile {index, image} (seulement les tuiles dont l'image change), state {vitals, ship, character, shipStatus} (au plus 4 par seconde, seulement si changé), feedback {index, feedback, detail?} après un appui de tuile. Un commentaire « : ping » toutes les 15 s. EventSource ne peut pas envoyer d'en-tête : passer le jeton en ?t=.",
 				"parameters": [
 					{
 						"name": "lang",
@@ -718,6 +718,84 @@
 							"text/event-stream": {
 								"schema": {
 									"type": "string"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
+		},
+		"/api/v1/character": {
+			"get": {
+				"operationId": "getCharacter",
+				"tags": [
+					"Character"
+				],
+				"summary": "Character overview — vue d'ensemble du perso",
+				"description": "Position (on foot, EVA, seated), crew role, seat and the 13 vitals, as shown in the Character tab of the page. available: false when the game is closed or the character has not spawned. — FR : position (à pied, EVA, assis), rôle d'équipage, siège et les 13 constantes, comme dans l'onglet Personnage de la page. available: false si le jeu est fermé ou le perso pas apparu.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Character — personnage",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Character"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/Unauthorized"
+					}
+				}
+			}
+		},
+		"/api/v1/ship/status": {
+			"get": {
+				"operationId": "getShipStatus",
+				"tags": [
+					"Ship"
+				],
+				"summary": "Ship instruments and warning lights — instruments et voyants du vaisseau",
+				"description": "Ship name, landed, master mode, instruments (shields, hull, hydrogen, quantum fuel, speed, radar altitude, heading) and the 10 warning lights, as shown in the Ship tab of the page. available: false outside a ship (character not seated) or when the game is closed. — FR : nom du vaisseau, posé, mode maître, instruments (boucliers, coque, hydrogène, quantum, vitesse, altitude radar, cap) et les 10 voyants, comme dans l'onglet Vaisseau de la page. available: false hors du vaisseau (perso pas assis) ou si le jeu est fermé.",
+				"parameters": [
+					{
+						"name": "lang",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"enum": [
+								"fr",
+								"en"
+							]
+						},
+						"description": "Label language (default: Accept-Language) — FR : langue des libellés (par défaut : Accept-Language)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Ship status — état du vaisseau",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ShipStatus"
 								}
 							}
 						}
@@ -1178,6 +1256,194 @@
 					},
 					"detail": {
 						"type": "string"
+					}
+				}
+			},
+			"Character": {
+				"type": "object",
+				"required": [
+					"available",
+					"locomotion",
+					"locomotionLabel",
+					"crewRole",
+					"crewRoleLabel",
+					"seat",
+					"vitals"
+				],
+				"properties": {
+					"available": {
+						"type": "boolean"
+					},
+					"locomotion": {
+						"enum": [
+							"on_foot",
+							"eva",
+							"seated",
+							"unknown"
+						]
+					},
+					"locomotionLabel": {
+						"type": "string"
+					},
+					"crewRole": {
+						"enum": [
+							"pilot",
+							"gunner",
+							"crew",
+							"none"
+						]
+					},
+					"crewRoleLabel": {
+						"type": "string"
+					},
+					"seat": {
+						"type": [
+							"string",
+							"null"
+						]
+					},
+					"vitals": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Vital"
+						}
+					}
+				}
+			},
+			"Instrument": {
+				"type": "object",
+				"required": [
+					"id",
+					"label",
+					"text",
+					"unit",
+					"level"
+				],
+				"properties": {
+					"id": {
+						"enum": [
+							"shields",
+							"hull",
+							"hydrogen",
+							"quantum",
+							"speed",
+							"radar_altitude",
+							"heading"
+						]
+					},
+					"label": {
+						"type": "string"
+					},
+					"text": {
+						"type": "string"
+					},
+					"unit": {
+						"type": "string"
+					},
+					"percent": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 100
+					},
+					"level": {
+						"enum": [
+							"ok",
+							"warn",
+							"bad",
+							"none"
+						]
+					}
+				}
+			},
+			"Annunciator": {
+				"type": "object",
+				"required": [
+					"id",
+					"label",
+					"state",
+					"flashing"
+				],
+				"properties": {
+					"id": {
+						"enum": [
+							"pwr",
+							"wpn",
+							"thr",
+							"shld",
+							"cool",
+							"qdrv",
+							"radr",
+							"prox",
+							"hit",
+							"misl"
+						]
+					},
+					"label": {
+						"type": "string"
+					},
+					"state": {
+						"enum": [
+							"off",
+							"nominal",
+							"minor",
+							"major",
+							"unknown"
+						]
+					},
+					"flashing": {
+						"type": "boolean"
+					}
+				}
+			},
+			"ShipStatus": {
+				"type": "object",
+				"required": [
+					"available",
+					"name",
+					"landed",
+					"masterMode",
+					"masterModeLabel",
+					"instruments",
+					"annunciators"
+				],
+				"properties": {
+					"available": {
+						"type": "boolean"
+					},
+					"name": {
+						"type": [
+							"string",
+							"null"
+						]
+					},
+					"landed": {
+						"type": [
+							"boolean",
+							"null"
+						]
+					},
+					"masterMode": {
+						"enum": [
+							"nav",
+							"scm",
+							"stealth",
+							null
+						]
+					},
+					"masterModeLabel": {
+						"type": "string"
+					},
+					"instruments": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Instrument"
+						}
+					},
+					"annunciators": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Annunciator"
+						}
 					}
 				}
 			}

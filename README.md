@@ -98,7 +98,7 @@ npm run build:web
 npm run start:web        # opens the page in your browser (add -- --no-open to skip)
 ```
 
-- Page: `http://127.0.0.1:8743/` — the app opens it with the access token included.
+- Page: `http://127.0.0.1:8743/` — the app opens it with the access token included. Three tabs: **Grid** (buttons), **Character** (position, crew role and all 13 vitals) and **Ship** (instruments, warning lights and the 17 functions, clickable).
 - Swagger UI: `http://127.0.0.1:8743/api/docs` — contract: `/api/v1/openapi.json`.
 - Every API call needs the token (`Authorization: Bearer …`), stored in `%APPDATA%\SC Telemetry Deck\settings.json`.
 - This preview listens on **this PC only** (`127.0.0.1`). Tablet / phone access (QR code), an editable grid and a single `.exe` come in the next steps.
