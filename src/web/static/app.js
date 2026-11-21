@@ -63,8 +63,62 @@ function applyTexts() {
 	$("h-functions").textContent = t("functions");
 	$("functions-hint").textContent = t("functionsHint");
 	$("h-emotes").textContent = t("emotes");
+	$("about-open").textContent = t("about");
+	$("about-close").textContent = t("close");
+	renderAbout();
 	$("emotes-hint").textContent = t("emotesHint");
 }
+
+// ---------- À propos ----------
+const REPO = "https://github.com/Sokren/sc-telemetry-streamdeck";
+const VIDEO = "https://youtu.be/t30sASa_oD4";
+let lastStatus = {};
+
+function renderAbout() {
+	const s = lastStatus;
+	$("about-title").textContent = t("aboutTitle");
+	const actions = { available: t("actionsAvailable"), unsupported: t("actionsNone") }[s.actions] ?? t("actionsUnknown");
+	const facts = [
+		[t("aboutVersion"), s.version ? `v${s.version}` : "—"],
+		[t("aboutSchema"), s.schema || "—"],
+		[t("aboutActions"), actions],
+		[t("aboutDev"), "Sokren"],
+	];
+	$("about-facts").replaceChildren(
+		...facts.flatMap(([k, v]) => {
+			const dt = document.createElement("dt");
+			const dd = document.createElement("dd");
+			dt.textContent = k;
+			dd.textContent = v;
+			return [dt, dd];
+		}),
+	);
+	$("about-notes").replaceChildren(
+		...["aboutAi", "aboutBeta", "aboutLocal", "aboutUnofficial"].map((k) => {
+			const li = document.createElement("li");
+			li.textContent = t(k);
+			return li;
+		}),
+	);
+	$("about-links").replaceChildren(
+		...[
+			[t("aboutGithub"), REPO],
+			[t("aboutIssues"), `${REPO}/issues`],
+			[t("aboutVideo"), VIDEO],
+		].map(([label, href]) => {
+			const a = document.createElement("a");
+			a.href = href;
+			a.target = "_blank";
+			a.rel = "noopener";
+			a.textContent = label;
+			return a;
+		}),
+	);
+}
+$("about-open").addEventListener("click", () => {
+	renderAbout();
+	$("about").showModal();
+});
 
 // ---------- Onglets ----------
 const TABS = ["grid", "character", "ship"];
@@ -246,6 +300,8 @@ function connect() {
 	source = new EventSource(`/api/v1/events?t=${encodeURIComponent(token)}&lang=${lang}`);
 	source.addEventListener("status", (e) => {
 		const s = JSON.parse(e.data);
+		lastStatus = s;
+		if ($("about").open) renderAbout();
 		// Version de l'appli (survol : version du jeu dont vient le schéma embarqué).
 		$("version").textContent = s.version ? `v${s.version}` : "";
 		$("version").title = s.schema ? `${t("gameSchema")} ${s.schema}` : "";

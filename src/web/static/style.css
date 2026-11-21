@@ -322,3 +322,62 @@ h2 {
 	font-weight: 600;
 	color: var(--text);
 }
+
+/* ---------- À propos ---------- */
+dialog {
+	background: var(--panel);
+	color: var(--text);
+	border: 1px solid #2a3038;
+	border-radius: 12px;
+	padding: 20px 22px;
+	max-width: min(560px, calc(100vw - 32px));
+}
+dialog::backdrop {
+	background: rgba(0, 0, 0, 0.6);
+}
+dialog h2 {
+	margin: 0 0 14px;
+	font-size: 18px;
+}
+dialog dl {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 6px 14px;
+	margin: 0 0 14px;
+	font-size: 14px;
+}
+dialog dt {
+	color: var(--muted);
+}
+dialog dd {
+	margin: 0;
+}
+dialog ul {
+	margin: 0 0 14px;
+	padding-left: 18px;
+	font-size: 13px;
+	color: var(--muted);
+	line-height: 1.45;
+}
+dialog .links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+	margin: 0 0 16px;
+	font-size: 14px;
+}
+dialog .links a {
+	color: #7fd1ff;
+}
+dialog form {
+	text-align: right;
+}
+dialog button {
+	background: transparent;
+	color: var(--text);
+	border: 1px solid #2a3038;
+	border-radius: 8px;
+	padding: 6px 14px;
+	font: inherit;
+	cursor: pointer;
+}
